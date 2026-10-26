@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: course-platform-db
+    environment:
+      POSTGRES_USER: course
+      POSTGRES_PASSWORD: course
+      POSTGRES_DB: course_platform
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U course"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  db-data:

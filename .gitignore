@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.env
+.angular/
+test-results/
+playwright-report/
+api/src/generated/

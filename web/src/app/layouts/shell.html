@@ -1,0 +1,54 @@
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+<aside class="rail" [class.is-admin]="isAdminArea">
+  <a class="brand" routerLink="/home" aria-label="Campus, ir para o início">
+    <span class="mark" aria-hidden="true">C</span>
+    <span class="label">Campus</span>
+  </a>
+  @if (isAdminArea) {
+    <p class="area-label label">Administração</p>
+  }
+
+  <nav [attr.aria-label]="isAdminArea ? 'Administração' : 'Principal'">
+    <ul>
+      @for (item of nav; track item.link) {
+        <li>
+          <a [routerLink]="item.link" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: !!item.exact }"
+            ariaCurrentWhenActive="page" [title]="item.label">
+            <i [class]="item.icon" aria-hidden="true"></i>
+            <span class="label">{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="rail-footer">
+    @if (auth.isAdmin()) {
+      @if (isAdminArea) {
+        <a routerLink="/home" class="switch" title="Ver como aluno">
+          <i class="ri-graduation-cap-line" aria-hidden="true"></i><span class="label">Ver como aluno</span>
+        </a>
+      } @else {
+        <a routerLink="/adm" class="switch" title="Administração">
+          <i class="ri-settings-4-line" aria-hidden="true"></i><span class="label">Administração</span>
+        </a>
+      }
+    }
+    @if (auth.user(); as user) {
+      <div class="user">
+        <span class="avatar" aria-hidden="true">{{ userInitials() }}</span>
+        <span class="label who">
+          <strong>{{ user.name }}</strong>
+          <small>{{ user.email }}</small>
+        </span>
+        <button type="button" class="btn btn-ghost btn-icon" (click)="auth.logout()" aria-label="Sair da conta" title="Sair">
+          <i class="ri-logout-box-r-line" aria-hidden="true"></i>
+        </button>
+      </div>
+    }
+  </div>
+</aside>
+
+<main id="main" tabindex="-1">
+  <router-outlet />
+</main>

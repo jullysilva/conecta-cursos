@@ -1,12 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ToastHost } from './shared/components/toast-host';
+import { ConfirmDialog } from './shared/components/confirm-dialog';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'cp-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, ToastHost, ConfirmDialog],
+  template: `
+    <router-outlet />
+    <cp-toast-host />
+    <cp-confirm-dialog />
+  `,
 })
-export class App {
-  protected readonly title = signal('web');
-}
+export class App {}

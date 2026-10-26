@@ -1,0 +1,85 @@
+<section class="panel content" aria-labelledby="content-title" [attr.aria-busy]="busy()">
+  <div class="head">
+    <h2 id="content-title">Conteúdo</h2>
+    <span class="muted">{{ course().modules.length }} módulos</span>
+  </div>
+
+  @for (module of course().modules; track module.id; let m = $index; let firstModule = $first; let lastModule = $last) {
+    <div class="module">
+      <div class="module-head">
+        <span class="index">{{ m + 1 }}</span>
+        @if (editingModuleId() === module.id) {
+          <label class="sr-only" [for]="'rename-' + module.id">Nome do módulo</label>
+          <input class="input" [id]="'rename-' + module.id" [ngModel]="editingTitle()" (ngModelChange)="editingTitle.set($event)"
+            (keydown.enter)="saveRename(module)" (keydown.escape)="editingModuleId.set(null)" (blur)="saveRename(module)" />
+        } @else {
+          <h3>{{ module.title }}</h3>
+        }
+        <div class="tools">
+          <button type="button" class="btn btn-ghost btn-icon" [disabled]="firstModule || busy()" (click)="moveModule(m, -1)"
+            [attr.aria-label]="'Mover módulo ' + module.title + ' para cima'" title="Mover para cima">
+            <i class="ri-arrow-up-line" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon" [disabled]="lastModule || busy()" (click)="moveModule(m, 1)"
+            [attr.aria-label]="'Mover módulo ' + module.title + ' para baixo'" title="Mover para baixo">
+            <i class="ri-arrow-down-line" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon" (click)="startRename(module)"
+            [attr.aria-label]="'Renomear módulo ' + module.title" title="Renomear">
+            <i class="ri-pencil-line" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon" (click)="removeModule(module)"
+            [attr.aria-label]="'Excluir módulo ' + module.title" title="Excluir">
+            <i class="ri-delete-bin-line" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <ol class="lessons">
+        @for (lesson of module.lessons; track lesson.id; let l = $index; let firstLesson = $first; let lastLesson = $last) {
+          <li>
+            <button type="button" class="lesson-open" (click)="openLesson(module, lesson)">
+              <span class="lesson-title">{{ lesson.title }}</span>
+              <span class="lesson-meta">
+                {{ lessonMeta(lesson) }}
+                @if (!lesson.videoRef) {
+                  <span class="badge is-warning">Sem vídeo</span>
+                }
+              </span>
+            </button>
+            <div class="tools">
+              <button type="button" class="btn btn-ghost btn-icon" [disabled]="firstLesson || busy()" (click)="moveLesson(module, l, -1)"
+                [attr.aria-label]="'Mover aula ' + lesson.title + ' para cima'" title="Mover para cima">
+                <i class="ri-arrow-up-s-line" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="btn btn-ghost btn-icon" [disabled]="lastLesson || busy()" (click)="moveLesson(module, l, 1)"
+                [attr.aria-label]="'Mover aula ' + lesson.title + ' para baixo'" title="Mover para baixo">
+                <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="btn btn-ghost btn-icon" (click)="removeLesson(lesson)"
+                [attr.aria-label]="'Excluir aula ' + lesson.title" title="Excluir">
+                <i class="ri-delete-bin-line" aria-hidden="true"></i>
+              </button>
+            </div>
+          </li>
+        }
+      </ol>
+      <button type="button" class="btn btn-ghost add-lesson" (click)="openLesson(module)">
+        <i class="ri-add-line" aria-hidden="true"></i> Adicionar aula
+      </button>
+    </div>
+  } @empty {
+    <p class="muted">Comece criando o primeiro módulo do curso.</p>
+  }
+
+  <form class="new-module" (ngSubmit)="addModule()">
+    <label class="sr-only" for="new-module">Nome do novo módulo</label>
+    <input id="new-module" name="newModule" class="input" placeholder="Nome do novo módulo"
+      [ngModel]="newModuleTitle()" (ngModelChange)="newModuleTitle.set($event)" />
+    <button type="submit" class="btn btn-secondary" [disabled]="newModuleTitle().trim().length < 2 || busy()">
+      <i class="ri-add-line" aria-hidden="true"></i> Adicionar módulo
+    </button>
+  </form>
+</section>
+
+<cp-lesson-dialog [modules]="course().modules" (saved)="saveLesson($event)" />

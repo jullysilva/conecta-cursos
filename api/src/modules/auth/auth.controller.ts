@@ -15,7 +15,7 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Public()
-  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Throttle({ default: { limit: env.authRateLimit, ttl: 60_000 } })
   @Post('login')
   @HttpCode(200)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
@@ -44,7 +44,7 @@ export class AuthController {
   }
 
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: { limit: Math.ceil(env.authRateLimit / 2), ttl: 60_000 } })
   @Post('forgot-password')
   @HttpCode(202)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {

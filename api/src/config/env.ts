@@ -18,5 +18,7 @@ export const env = {
   smtpHost: process.env.SMTP_HOST ?? 'localhost',
   smtpPort: Number(process.env.SMTP_PORT ?? 1025),
   mailFrom: process.env.MAIL_FROM ?? 'no-reply@course-platform.local',
+  /** Login attempts per minute per client; raised only for automated test runs. */
+  authRateLimit: Number(process.env.AUTH_RATE_LIMIT ?? 10),
   isTest: process.env.NODE_ENV === 'test',
 };

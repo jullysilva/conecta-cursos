@@ -1,0 +1,95 @@
+@if (lesson.error()) {
+  <cp-empty-state icon="ri-error-warning-line" title="Aula não encontrada"
+    text="Ela pode ter sido removida ou o curso ainda não foi publicado.">
+    <a routerLink="/home" class="btn btn-secondary">Voltar para o início</a>
+  </cp-empty-state>
+} @else if (lesson.value(); as lesson) {
+  <div class="layout">
+    <article class="main">
+      <nav class="crumbs" aria-label="Você está em">
+        <a [routerLink]="['/curso', lesson.course.id]">
+          <i class="ri-arrow-left-line" aria-hidden="true"></i> {{ lesson.course.title }}
+        </a>
+      </nav>
+
+      @if (outline.value(); as course) {
+        <cp-progress-rail [percent]="course.progress.percent" label="Progresso no curso" />
+      }
+
+      @defer (on viewport) {
+        <cp-video-player
+          [provider]="lesson.videoProvider"
+          [videoRef]="lesson.videoRef"
+          [title]="lesson.title"
+          [startAt]="lesson.progress.positionSec"
+          (positionChange)="onPosition($event)"
+          (ended)="onEnded()"
+        />
+      } @placeholder {
+        <div class="player-placeholder"></div>
+      }
+
+      <header class="lesson-head">
+        <div>
+          @if (moduleNumber()) {
+            <p class="module">Módulo {{ moduleNumber() }}: {{ lesson.module.title }}</p>
+          }
+          <h1>{{ lesson.title }}</h1>
+        </div>
+        <button type="button" class="btn" [class.btn-primary]="!completed()" [class.btn-secondary]="completed()"
+          [attr.aria-pressed]="completed()" (click)="setCompleted(!completed())">
+          <i [class]="completed() ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line'" aria-hidden="true"></i>
+          {{ completed() ? 'Concluída' : 'Marcar como concluída' }}
+        </button>
+      </header>
+
+      @if (lesson.description) {
+        <p class="description">{{ lesson.description }}</p>
+      }
+      @if (lesson.materialUrl) {
+        <a class="material" [href]="lesson.materialUrl" target="_blank" rel="noopener">
+          <i class="ri-file-download-line" aria-hidden="true"></i> Baixar material de apoio
+        </a>
+      }
+
+      <nav class="pager" aria-label="Navegação entre aulas">
+        @if (lesson.previousLessonId) {
+          <a class="btn btn-secondary" [routerLink]="['/aula', lesson.previousLessonId]">
+            <i class="ri-arrow-left-s-line" aria-hidden="true"></i> Aula anterior
+          </a>
+        }
+        @if (lesson.nextLessonId) {
+          <a class="btn btn-primary next" [routerLink]="['/aula', lesson.nextLessonId]">
+            Próxima aula <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+          </a>
+        } @else if (completed()) {
+          <a class="btn btn-primary next" [routerLink]="['/curso', lesson.course.id]">Voltar ao curso</a>
+        }
+      </nav>
+    </article>
+
+    <aside class="outline" aria-label="Aulas do curso">
+      @for (module of outline.value()?.modules ?? []; track module.id; let m = $index) {
+        <section>
+          <h2>{{ m + 1 }}. {{ module.title }}</h2>
+          <ol>
+            @for (item of module.lessons; track item.id) {
+              <li>
+                <a [routerLink]="['/aula', item.id]" [class.is-current]="item.id === lesson.id"
+                  [attr.aria-current]="item.id === lesson.id ? 'page' : null">
+                  <i [class]="item.completed ? 'ri-checkbox-circle-fill done' : 'ri-play-circle-line'" aria-hidden="true"></i>
+                  <span>{{ item.title }}</span>
+                  @if (item.completed) {
+                    <span class="sr-only">(concluída)</span>
+                  }
+                </a>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </aside>
+  </div>
+} @else {
+  <p class="loading" role="status">Carregando aula…</p>
+}

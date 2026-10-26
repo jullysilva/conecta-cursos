@@ -1,0 +1,78 @@
+@if (course.isLoading()) {
+  <p class="loading" role="status">Carregando curso…</p>
+} @else if (course.error()) {
+  <cp-empty-state icon="ri-error-warning-line" title="Curso não encontrado"
+    text="Ele pode ter sido removido ou ainda não foi publicado.">
+    <a routerLink="/home" class="btn btn-secondary">Voltar para o início</a>
+  </cp-empty-state>
+} @else if (course.value(); as course) {
+  <nav class="crumbs" aria-label="Você está em">
+    <a routerLink="/home">Início</a>
+    @if (course.category) {
+      <span aria-hidden="true">/</span> <span>{{ course.category.name }}</span>
+    }
+  </nav>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <h1>{{ course.title }}</h1>
+      @if (course.description) {
+        <p class="description">{{ course.description }}</p>
+      }
+      <ul class="facts">
+        <li><i class="ri-stack-line" aria-hidden="true"></i> {{ course.modules.length }} módulos</li>
+        <li><i class="ri-play-circle-line" aria-hidden="true"></i> {{ course.progress.totalLessons }} aulas</li>
+        @if (course.workloadHours) {
+          <li><i class="ri-time-line" aria-hidden="true"></i> {{ course.workloadHours }}h de carga horária</li>
+        } @else if (totalDuration()) {
+          <li><i class="ri-time-line" aria-hidden="true"></i> {{ formatDuration(totalDuration()) }} de vídeo</li>
+        }
+      </ul>
+      <cp-progress-rail size="lg" [percent]="course.progress.percent" label="Seu progresso no curso" />
+      @if (course.nextLessonId) {
+        <a class="btn btn-primary" [routerLink]="['/aula', course.nextLessonId]">
+          <i class="ri-play-fill" aria-hidden="true"></i> {{ ctaLabel() }}
+        </a>
+      }
+    </div>
+    <cp-course-cover [title]="course.title" [imageUrl]="course.thumbnailUrl" />
+  </header>
+
+  <section class="outline" aria-labelledby="outline-title">
+    <h2 id="outline-title">Conteúdo do curso</h2>
+    @for (module of course.modules; track module.id; let m = $index) {
+      <div class="module panel">
+        <h3>
+          <button type="button" class="module-toggle" (click)="toggle(module.id)"
+            [attr.aria-expanded]="!collapsed().has(module.id)" [attr.aria-controls]="'module-' + module.id">
+            <span class="module-index">Módulo {{ m + 1 }}</span>
+            <span class="module-title">{{ module.title }}</span>
+            <i [class]="collapsed().has(module.id) ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line'" aria-hidden="true"></i>
+          </button>
+        </h3>
+        @if (!collapsed().has(module.id)) {
+          <ol class="lessons" [id]="'module-' + module.id">
+            @for (lesson of module.lessons; track lesson.id) {
+              <li>
+                <a [routerLink]="['/aula', lesson.id]" [class.is-done]="lesson.completed">
+                  <i [class]="lesson.completed ? 'ri-checkbox-circle-fill' : 'ri-play-circle-line'" aria-hidden="true"></i>
+                  <span class="lesson-title">{{ lesson.title }}</span>
+                  @if (lesson.completed) {
+                    <span class="sr-only">(concluída)</span>
+                  }
+                  @if (lesson.durationSec) {
+                    <span class="duration">{{ formatDuration(lesson.durationSec) }}</span>
+                  }
+                </a>
+              </li>
+            } @empty {
+              <li class="no-lessons">Nenhuma aula neste módulo ainda.</li>
+            }
+          </ol>
+        }
+      </div>
+    } @empty {
+      <cp-empty-state icon="ri-stack-line" title="Este curso ainda não tem aulas" />
+    }
+  </section>
+}

@@ -1,0 +1,129 @@
+:host {
+  display: grid;
+  gap: 2.5rem;
+  max-width: 1280px;
+}
+
+.greeting h1 {
+  font-size: 2.75rem;
+}
+
+.resume {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--ink);
+  color: #fff;
+
+  cp-course-cover {
+    height: 100%;
+  }
+}
+
+.resume-body {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.875rem;
+  padding: 2rem 2.5rem;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  cp-progress-rail {
+    width: 100%;
+    max-width: 440px;
+    --rail-track: rgb(255 255 255 / 14%);
+  }
+}
+
+.kicker {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.resume-meta {
+  max-width: 56ch;
+  color: #c4d0d8;
+}
+
+.block {
+  display: grid;
+  gap: 1rem;
+}
+
+.block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  a {
+    font-weight: 600;
+  }
+}
+
+.shelf {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, calc((100% - 3 * 1.25rem) / 4));
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x proximity;
+
+  > * {
+    scroll-snap-align: start;
+  }
+}
+
+.paths {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.path {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+
+  i {
+    font-size: 1.5rem;
+    color: var(--forest);
+  }
+
+  span {
+    display: grid;
+  }
+
+  small {
+    color: var(--ink-faint);
+  }
+
+  &:hover strong {
+    color: var(--forest);
+  }
+}
+
+.loading {
+  color: var(--ink-soft);
+}
+
+@media (max-width: 1100px) {
+  .resume {
+    grid-template-columns: 1fr;
+  }
+
+  .paths {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

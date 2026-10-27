@@ -7,3 +7,4 @@ test-results/
 playwright-report/
 api/src/generated/
 .claude/settings.local.json
+*.tsbuildinfo

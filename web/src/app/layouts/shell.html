@@ -1,8 +1,7 @@
 <a class="skip-link" href="#main">Pular para o conteúdo</a>
 <aside class="rail">
-  <a class="brand" routerLink="/home" aria-label="Campus, ir para o início">
-    <span class="mark" aria-hidden="true">C</span>
-    <span class="label">Campus</span>
+  <a class="brand" routerLink="/home" [attr.aria-label]="brandName + ', ir para o início'">
+    <cp-brand-mark [size]="36" />
   </a>
   <p class="area-label label">Administração</p>
 

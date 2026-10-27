@@ -60,7 +60,7 @@ import { valueOf } from '../../shared/utils/resource';
     .metrics div { padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
     .metrics .lead { grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between;
       background: var(--emphasis); border-color: var(--emphasis); color: var(--on-emphasis); }
-    .metrics .lead dd { font-size: 5rem; color: var(--amber); }
+    .metrics .lead dd { font-size: 5rem; color: var(--brand-lime); }
     dt { color: inherit; opacity: 0.8; font-weight: 600; }
     dd { margin: 0.375rem 0 0; font: 800 2.25rem/1 var(--font-display); }
     dd small { font-size: 1rem; font-weight: 600; color: var(--ink-faint); }

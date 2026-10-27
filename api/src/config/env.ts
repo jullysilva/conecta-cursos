@@ -17,7 +17,7 @@ export const env = {
   webUrl: process.env.WEB_URL ?? 'http://localhost:4300',
   smtpHost: process.env.SMTP_HOST ?? 'localhost',
   smtpPort: Number(process.env.SMTP_PORT ?? 1025),
-  mailFrom: process.env.MAIL_FROM ?? 'no-reply@course-platform.local',
+  mailFrom: process.env.MAIL_FROM ?? 'no-reply@conecta-cursos.local',
   /** Login attempts per minute per client; raised only for automated test runs. */
   authRateLimit: Number(process.env.AUTH_RATE_LIMIT ?? 10),
   isTest: process.env.NODE_ENV === 'test',

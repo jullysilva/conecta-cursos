@@ -8,6 +8,7 @@ import { CourseCover } from './course-cover';
 import { Pagination } from './pagination';
 import { ProgressRail } from './progress-rail';
 import { CourseCard } from './course-card';
+import { BrandMark } from './brand-mark';
 
 describe('ProgressRail', () => {
   it('clamps and exposes the value to assistive tech', async () => {
@@ -109,5 +110,26 @@ describe('ToastService', () => {
     vi.advanceTimersByTime(4000);
     expect(toasts.toasts()).toEqual([]);
     vi.useRealTimers();
+  });
+});
+
+describe('BrandMark', () => {
+  it('shows the decorative symbol at the requested size with the brand name as text', async () => {
+    const fixture = TestBed.createComponent(BrandMark);
+    fixture.componentRef.setInput('size', 32);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const img = el.querySelector('img')!;
+    expect(img.getAttribute('src')).toBe('brand/symbol-96.png');
+    expect(img.getAttribute('alt')).toBe('');
+    expect(img.getAttribute('width')).toBe('32');
+    expect(el.querySelector('.name')?.textContent?.trim()).toBe('Conecta Cursos');
+  });
+
+  it('can render the symbol alone', async () => {
+    const fixture = TestBed.createComponent(BrandMark);
+    fixture.componentRef.setInput('showName', false);
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('.name')).toBeNull();
   });
 });

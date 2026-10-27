@@ -1,6 +1,7 @@
 <!--
 Sync Impact Report
-- Version: template → 1.0.0 (primeira ratificação)
+- Version: 1.0.0 → 1.0.1 (PATCH: o limite de bundle é medido em brotli, não gzip; checagem no CI)
+- Anterior: template → 1.0.0 (primeira ratificação)
 - Princípios adicionados: I–VII (todos novos)
 - Seções adicionadas: Stack e convenções técnicas; Fluxo de trabalho e entrega; Governança
 - Templates revisados: plan-template.md ✅ (Constitution Check lê este arquivo), spec-template.md ✅, tasks-template.md ✅
@@ -52,7 +53,8 @@ Lógica repetida em dois ou mais lugares vira utilitário compartilhado, com tes
 - Textos de interface no ponto de vista do usuário, com verbos de ação ("Salvar curso") e erros
   que dizem o que aconteceu e como resolver.
 - Performance: as rotas usam lazy loading e o bundle inicial do web DEVE ficar abaixo de 100 kB
-  gzip (hoje está em ~91 kB).
+  de transferência estimada (brotli, o valor que o `ng build` mostra; hoje está em ~91 kB). O CI
+  confere isso com `web/scripts/check-bundle-size.mjs`.
 
 ### VI. Somente tablet e PC
 O layout é suportado a partir de 768px de largura (tablet e PC). Layout mobile está fora do
@@ -103,4 +105,4 @@ em "Complexity Tracking". Alterações nesta constituição seguem versionamento
 remove ou redefine um princípio, MINOR adiciona, PATCH esclarece) e são feitas por
 `/speckit-constitution`, em PR própria.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-27 | **Last Amended**: 2026-10-27
+**Version**: 1.0.1 | **Ratified**: 2026-10-27 | **Last Amended**: 2026-10-27

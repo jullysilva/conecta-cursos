@@ -13,6 +13,8 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:4301',
+    // GitHub runners ship Google Chrome with its system libraries, which saves ~7 min of apt installs.
+    channel: process.env['CI'] ? 'chrome' : undefined,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

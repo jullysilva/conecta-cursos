@@ -35,6 +35,16 @@ E-mails de recuperação de senha vão para o SMTP configurado (padrão: MailHog
 
 O reset do banco de teste (`api/prisma/reset-test-db.ts`) recusa qualquer banco cujo nome não termine em `_test`.
 
+## CI (GitHub Actions)
+
+O workflow `.github/workflows/ci.yml` roda em toda PR para a `main` e a cada push na `main`:
+
+| Job | O que faz |
+|---|---|
+| API | oxlint, `tsc`, testes unitários com cobertura, E2E contra Postgres 17 de serviço e build |
+| Web | testes unitários com cobertura, build de produção e limite de 100 kB (brotli) no bundle inicial (`web/scripts/check-bundle-size.mjs`) |
+| Interface | Playwright em PC e tablet com axe; só roda quando a mudança toca `web/` ou o workflow. Em caso de falha, o relatório fica como artefato |
+
 ## Spec-driven development (spec-kit)
 
 O projeto usa o [GitHub Spec Kit](https://github.com/github/spec-kit). Os princípios ficam em

@@ -43,7 +43,7 @@ O workflow `.github/workflows/ci.yml` roda em toda PR para a `main` e a cada pus
 |---|---|
 | API | oxlint, `tsc`, testes unitários com cobertura, E2E contra Postgres 17 de serviço e build |
 | Web | testes unitários com cobertura, build de produção e limite de 100 kB (brotli) no bundle inicial (`web/scripts/check-bundle-size.mjs`) |
-| Interface | Playwright em PC e tablet com axe; só roda quando a mudança toca `web/` ou o workflow. Em caso de falha, o relatório fica como artefato |
+| Interface | Playwright em PC e tablet com axe; só roda quando a mudança toca `web/` ou o workflow. No CI usa o Google Chrome que já vem no runner. Em caso de falha, o relatório fica como artefato |
 
 ## Spec-driven development (spec-kit)
 

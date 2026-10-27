@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape-html.js';
 import { slugify } from './slugify.js';
 import { uniqueSlug } from './unique-slug.js';
 import { generateToken, hashToken } from './token.js';
@@ -29,5 +30,17 @@ describe('token', () => {
     expect(a).toMatch(/^[A-Za-z0-9_-]{64}$/);
     expect(hashToken(a)).toBe(hashToken(a));
     expect(hashToken(a)).toHaveLength(64);
+  });
+});
+
+describe('escapeHtml', () => {
+  it('neutralizes markup and attribute quotes', () => {
+    expect(escapeHtml(`<a href="x" onclick='y'>Tom & Jerry</a>`)).toBe(
+      '&lt;a href=&quot;x&quot; onclick=&#39;y&#39;&gt;Tom &amp; Jerry&lt;/a&gt;',
+    );
+  });
+
+  it('keeps plain text and accents as they are', () => {
+    expect(escapeHtml('Maria José')).toBe('Maria José');
   });
 });

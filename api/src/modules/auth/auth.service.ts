@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { MailService } from '../../infra/mail/mail.service.js';
 import { env } from '../../config/env.js';
 import { generateToken, hashToken } from '../../common/utils/token.js';
+import { escapeHtml } from '../../common/utils/escape-html.js';
 import type { User } from '../../generated/prisma/client.js';
 
 const RESET_TTL_MS = 60 * 60 * 1000;
@@ -94,7 +95,7 @@ export class AuthService {
     await this.mail.send(
       user.email,
       'Redefinição de senha',
-      `<p>Olá, ${user.name}.</p><p>Para redefinir sua senha, acesse: <a href="${link}">${link}</a></p><p>O link expira em 1 hora.</p>`,
+      `<p>Olá, ${escapeHtml(user.name)}.</p><p>Para redefinir sua senha, acesse: <a href="${link}">${link}</a></p><p>O link expira em 1 hora.</p>`,
     );
     return token;
   }

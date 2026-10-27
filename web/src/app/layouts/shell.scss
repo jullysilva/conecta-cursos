@@ -26,12 +26,8 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 1.25rem 0.875rem;
-  background: var(--ink);
+  background: #22323f;
   color: #dfe7ec;
-
-  &.is-admin {
-    background: #22323f;
-  }
 }
 
 .brand {

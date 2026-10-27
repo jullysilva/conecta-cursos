@@ -1,89 +1,46 @@
-<header class="greeting">
-  <h1>Olá, {{ firstName() }}</h1>
-</header>
-
-@if (resume(); as course) {
-  <section class="resume" aria-labelledby="resume-title">
-    <cp-course-cover [title]="course.title" [imageUrl]="course.thumbnailUrl" />
-    <div class="resume-body">
-      <p class="kicker">Continue de onde parou</p>
-      <h2 id="resume-title">{{ course.title }}</h2>
-      <p class="resume-meta">
-        {{ course.progress.completedLessons }} de {{ course.progress.totalLessons }} aulas concluídas
-      </p>
-      <cp-progress-rail size="lg" [percent]="course.progress.percent" [label]="'Progresso em ' + course.title" />
-      <a class="btn btn-primary"
-        [routerLink]="course.lastLessonId ? ['/aula', course.lastLessonId] : ['/curso', course.id]">
-        <i class="ri-play-fill" aria-hidden="true"></i> Continuar
-      </a>
-    </div>
-  </section>
-} @else if (featured.value(); as course) {
-  <section class="resume" aria-labelledby="featured-title">
-    <cp-course-cover [title]="course.title" [imageUrl]="course.thumbnailUrl" />
-    <div class="resume-body">
-      <p class="kicker">Comece por aqui</p>
-      <h2 id="featured-title">{{ course.title }}</h2>
-      <p class="resume-meta">{{ course.description }}</p>
-      <a class="btn btn-primary" [routerLink]="['/curso', course.id]">Ver curso</a>
-    </div>
-  </section>
-}
-
 @if (banners.value()?.length) {
-  <cp-banner-carousel class="block" [banners]="banners.value()!" />
+  <cp-mova-banner [slides]="banners.value()!" />
 }
 
-@if (otherInProgress().length) {
-  <section class="block" aria-labelledby="progress-title">
-    <h2 id="progress-title">Em andamento</h2>
-    <div class="shelf">
-      @for (course of otherInProgress(); track course.id) {
-        <cp-course-card [course]="course" />
-      }
-    </div>
-  </section>
-}
-
-@if (paths.value()?.length) {
-  <section class="block" aria-labelledby="paths-title">
-    <div class="block-head">
-      <h2 id="paths-title">Trilhas</h2>
-      <a routerLink="/trilhas">Ver todas</a>
-    </div>
-    <div class="paths">
-      @for (path of paths.value()!.slice(0, 3); track path.id) {
-        <a class="path" [routerLink]="['/trilhas', path.id]">
-          <i class="ri-route-line" aria-hidden="true"></i>
-          <span>
-            <strong>{{ path.title }}</strong>
-            <small>{{ path.coursesCount }} {{ path.coursesCount === 1 ? 'curso' : 'cursos' }}</small>
-          </span>
-        </a>
-      }
-    </div>
-  </section>
-}
-
-@if (categories.isLoading()) {
-  <p class="loading" role="status">Carregando cursos…</p>
-} @else if (categories.error()) {
-  <cp-empty-state icon="ri-wifi-off-line" title="Não foi possível carregar os cursos"
-    text="Verifique sua conexão e tente novamente.">
-    <button type="button" class="btn btn-secondary" (click)="categories.reload()">Tentar de novo</button>
-  </cp-empty-state>
-} @else {
-  @for (category of categories.value(); track category.id) {
-    <section class="block" [attr.aria-labelledby]="'cat-' + category.id">
-      <h2 [id]="'cat-' + category.id">{{ category.name }}</h2>
-      <div class="shelf">
-        @for (course of category.courses; track course.id) {
-          <cp-course-card [course]="course" />
+<div class="content" [class.without-banner]="!banners.value()?.length">
+  @if (categories.isLoading()) {
+    <div class="skeleton" role="status" aria-label="Carregando cursos">
+      <span class="skeleton-title"></span>
+      <div class="skeleton-row">
+        @for (card of skeletonCards; track card) {
+          <span class="skeleton-card"></span>
         }
       </div>
-    </section>
-  } @empty {
-    <cp-empty-state icon="ri-book-open-line" title="Nenhum curso publicado ainda"
-      text="Assim que um curso for publicado, ele aparece aqui." />
+    </div>
+  } @else if (categories.error()) {
+    <div class="empty">
+      <i class="ri-wifi-off-line" aria-hidden="true"></i>
+      <h2>Não foi possível carregar seus cursos.</h2>
+      <p>Verifique sua conexão e tente novamente.</p>
+      <button type="button" class="btn btn-primary" (click)="categories.reload()">Tentar novamente</button>
+    </div>
+  } @else if (!categoryCarousels().length) {
+    <div class="empty">
+      <i class="ri-graduation-cap-line" aria-hidden="true"></i>
+      <h2>Você ainda não tem cursos disponíveis.</h2>
+      <p>Assim que um curso for publicado, ele aparece aqui.</p>
+    </div>
+  } @else {
+    @if (progressCarousel(); as progress) {
+      @if (featuredCarousel(); as featuredCourses) {
+        <div class="progress-row">
+          <cp-course-carousel class="progress-col" [compact]="true" [title]="progress.title" [anchorId]="progress.anchorId"
+            [courses]="progress.courses" [itemsPerPageConfig]="progressRowConfig" />
+          <cp-course-carousel class="is-featured" [compact]="true" title="Em destaque" anchorId="destaque"
+            [courses]="featuredCourses" [itemsPerPageConfig]="featuredRowConfig" />
+        </div>
+      } @else {
+        <cp-course-carousel [title]="progress.title" [anchorId]="progress.anchorId" [courses]="progress.courses" />
+      }
+    }
+
+    @for (row of categoryCarousels(); track row.id) {
+      <cp-course-carousel [title]="row.title" [anchorId]="row.anchorId" [courses]="row.courses" />
+    }
   }
-}
+</div>

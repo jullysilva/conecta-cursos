@@ -1,7 +1,9 @@
 # Campus — plataforma de cursos
 
-LMS corporativo inspirado na arquitetura funcional do Mova (engenharia reversa das rotas e da API
-públicas), com identidade visual própria. Suporte a **PC e tablet** (sem layout mobile).
+LMS corporativo inspirado no Mova (engenharia reversa das rotas, da API e do CSS públicos).
+A área do aluno segue o design do Mova (tema escuro, header fixo com barra de progresso, banner em
+tela cheia e carrosséis de cards em pôster), com nome e logotipo próprios. O painel admin mantém
+o tema claro. Suporte a **PC e tablet** (sem layout mobile).
 
 | Pasta | Stack |
 |---|---|
@@ -35,8 +37,9 @@ O reset do banco de teste (`api/prisma/reset-test-db.ts`) recusa qualquer banco 
 
 ## Funcionalidades
 
-**Aluno:** login, recuperação e redefinição de senha; home com "continue de onde parou", banners,
-trilhas e prateleiras por categoria; página do curso com módulos e aulas; player (YouTube, Vimeo,
+**Aluno:** login, recuperação e redefinição de senha; home com banner em carrossel, "Continue assistindo"
+(ou "Recomendados para você"), curso em destaque e um carrossel por categoria, com detalhes do curso
+ao clicar no pôster; header com atalhos para as categorias e progresso geral; página do curso com módulos e aulas; player (YouTube, Vimeo,
 Panda ou arquivo .mp4) com progresso salvo, inclusive ao fechar a aba (`sendBeacon`); trilhas; meu progresso.
 
 **Admin (`/adm`):** visão geral; cursos com editor de módulos e aulas (criar, editar, mover, reordenar,

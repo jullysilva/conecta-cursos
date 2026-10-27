@@ -1,14 +1,12 @@
 <a class="skip-link" href="#main">Pular para o conteúdo</a>
-<aside class="rail" [class.is-admin]="isAdminArea">
+<aside class="rail">
   <a class="brand" routerLink="/home" aria-label="Campus, ir para o início">
     <span class="mark" aria-hidden="true">C</span>
     <span class="label">Campus</span>
   </a>
-  @if (isAdminArea) {
-    <p class="area-label label">Administração</p>
-  }
+  <p class="area-label label">Administração</p>
 
-  <nav [attr.aria-label]="isAdminArea ? 'Administração' : 'Principal'">
+  <nav aria-label="Administração">
     <ul>
       @for (item of nav; track item.link) {
         <li>
@@ -23,17 +21,9 @@
   </nav>
 
   <div class="rail-footer">
-    @if (auth.isAdmin()) {
-      @if (isAdminArea) {
-        <a routerLink="/home" class="switch" title="Ver como aluno">
-          <i class="ri-graduation-cap-line" aria-hidden="true"></i><span class="label">Ver como aluno</span>
-        </a>
-      } @else {
-        <a routerLink="/adm" class="switch" title="Administração">
-          <i class="ri-settings-4-line" aria-hidden="true"></i><span class="label">Administração</span>
-        </a>
-      }
-    }
+    <a routerLink="/home" class="switch" title="Ver como aluno">
+      <i class="ri-graduation-cap-line" aria-hidden="true"></i><span class="label">Ver como aluno</span>
+    </a>
     @if (auth.user(); as user) {
       <div class="user">
         <span class="avatar" aria-hidden="true">{{ userInitials() }}</span>

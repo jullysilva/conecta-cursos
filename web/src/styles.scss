@@ -356,3 +356,85 @@ dialog.modal {
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
+/*
+ * Student area theme, modelled on Mova's dark UI: near-black surfaces,
+ * violet accent, green progress and Montserrat throughout.
+ */
+.theme-mova {
+  --mova-black: #000000;
+  --mova-bg: #181818;
+  --mova-raised: #222222;
+  --mova-min: #282828;
+  --mova-raised-strong: #323232;
+  --mova-white: #fbfbfb;
+  --mova-white-hover: #d3d4d5;
+  --mova-white-active: #aeb0b3;
+  --mova-accent: #6c53e8;
+  --mova-accent-hover: #5d44db;
+  --mova-green: #06a851;
+  --mova-header-height: 72px;
+  --mova-level-bar-height: 44px;
+
+  /* Remap the shared tokens so existing student pages follow the theme. */
+  --paper: var(--mova-bg);
+  --surface: var(--mova-raised);
+  --ink: var(--mova-white);
+  --ink-soft: var(--mova-white-hover);
+  --ink-faint: var(--mova-white-active);
+  --line: var(--mova-raised-strong);
+  --forest: #9d8cf2;
+  --forest-strong: var(--mova-accent-hover);
+  --forest-tint: rgb(108 83 232 / 22%);
+  --amber: var(--mova-green);
+  --amber-tint: rgb(251 251 251 / 20%);
+  --danger-tint: rgb(194 65 45 / 22%);
+  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
+  --focus: 0 0 0 3px rgb(108 83 232 / 55%);
+
+  display: block;
+  min-height: 100vh;
+  background: var(--mova-bg);
+  color: var(--mova-white);
+  font-family: var(--font-body);
+
+  .btn-primary {
+    background: var(--mova-accent);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: var(--mova-accent-hover);
+    }
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--mova-white-active);
+    color: var(--mova-white);
+
+    &:hover:not(:disabled) {
+      background: var(--mova-min);
+    }
+  }
+
+  .input {
+    background: var(--mova-min);
+    border-color: var(--mova-raised-strong);
+    color: var(--mova-white);
+  }
+
+  .badge.is-positive {
+    background: rgb(6 168 81 / 20%);
+    color: #4fd38b;
+  }
+
+  /* Routed pages: the home runs edge to edge, every other page gets Mova's 3.5rem gutter. */
+  main > :not(router-outlet, cp-home) {
+    padding: 2rem 3.5rem 3rem;
+
+    @media (max-width: 1100px) {
+      padding: 1.5rem;
+    }
+  }
+}

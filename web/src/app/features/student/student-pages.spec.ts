@@ -63,23 +63,37 @@ function setup(overrides: Partial<Record<keyof LearningService, unknown>> = {}) 
 }
 
 describe('Home', () => {
-  it('greets the student and offers to resume the last lesson', async () => {
-    setup();
+  it('shows the banner, continue watching, featured and category rows', async () => {
+    setup({ featuredCourse: vi.fn(() => of({ ...course, progress: progress(0) })) });
     const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('h1')?.textContent).toContain('Olá, Ana');
-    expect(el.textContent).toContain('Continue de onde parou');
-    expect(el.querySelector('.resume a')?.getAttribute('href')).toBe('/aula/l2');
-    expect(el.textContent).toContain('Gestão');
-    expect(el.textContent).toContain('Trilha');
+    expect(el.querySelector('cp-mova-banner')).not.toBeNull();
+    const titles = Array.from(el.querySelectorAll('h2')).map((h) => h.textContent?.trim());
+    expect(titles).toEqual(['Continue assistindo', 'Em destaque', 'Gestão']);
+    // Continue watching resumes from the last lesson.
+    expect(el.querySelector('.progress-row .info-cta')?.getAttribute('href')).toBe('/aula/l2');
+    expect(el.querySelector('#gestao')).not.toBeNull();
+  });
+
+  it('recommends courses not started when there is nothing to continue', async () => {
+    setup({ summary: vi.fn(() => of({ ...summary, continueWatching: [] })) });
+    const fixture = TestBed.createComponent(Home);
+    await fixture.whenStable();
+    const titles = Array.from(fixture.nativeElement.querySelectorAll('h2')).map((h) => (h as HTMLElement).textContent?.trim());
+    expect(titles[0]).toBe('Recomendados para você');
   });
 
   it('shows a retry when the catalog fails to load', async () => {
-    setup({ categories: vi.fn(() => throwError(() => new Error('offline'))) });
+    const categories = vi.fn(() => throwError(() => new Error('offline')) as ReturnType<LearningService['categories']>);
+    setup({ categories });
     const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Não foi possível carregar os cursos');
+    expect(fixture.nativeElement.textContent).toContain('Não foi possível carregar seus cursos.');
+    categories.mockReturnValue(of([]));
+    (fixture.nativeElement.querySelector('.empty button') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent).toContain('Você ainda não tem cursos disponíveis.');
   });
 });
 

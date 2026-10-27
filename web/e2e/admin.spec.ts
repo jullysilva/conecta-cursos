@@ -31,7 +31,9 @@ test.describe('Administração', () => {
     const studentContext = await browser.newContext();
     const student = await studentContext.newPage();
     await login(student, STUDENT);
-    await student.getByRole('link', { name: new RegExp(title) }).first().click();
+    const card = student.getByRole('button', { name: title }).first();
+    await card.click();
+    await student.locator(`#${await card.getAttribute('aria-controls')}`).getByRole('link', { name: 'Iniciar' }).click();
     await student.getByRole('link', { name: 'Começar curso' }).click();
     await expect(student.getByRole('heading', { level: 1, name: 'Boas-vindas' })).toBeVisible();
     await expect(student.locator('iframe[src*="youtube-nocookie.com/embed/aqz-KE-bpKQ"]')).toBeAttached();

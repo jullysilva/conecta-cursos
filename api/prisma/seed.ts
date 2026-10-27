@@ -31,6 +31,9 @@ const catalog = [
   },
 ];
 
+/** Poster (2:3) placeholder image, stable per course. */
+const posterUrl = (slug: string) => `https://picsum.photos/seed/${slug}/600/900`;
+
 function slugify(value: string) {
   return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -59,6 +62,9 @@ async function main() {
       const slug = slugify(item.title);
       const existing = await prisma.course.findUnique({ where: { slug } });
       if (existing) {
+        if (!existing.thumbnailUrl) {
+          await prisma.course.update({ where: { id: existing.id }, data: { thumbnailUrl: posterUrl(slug) } });
+        }
         createdCourseIds.push(existing.id);
         continue;
       }
@@ -67,6 +73,7 @@ async function main() {
           title: item.title,
           slug,
           description: `Aprenda na prática os conceitos essenciais de ${item.title.toLowerCase()}.`,
+          thumbnailUrl: posterUrl(slug),
           workloadHours: item.modules.length * 2,
           published: true,
           featured: item.featured ?? false,
@@ -107,8 +114,8 @@ async function main() {
   if (!(await prisma.banner.count())) {
     await prisma.banner.createMany({
       data: [
-        { title: 'Bem-vindo à plataforma', subtitle: 'Explore cursos e trilhas feitos para você', imageUrl: 'https://picsum.photos/seed/course-banner-1/1600/500', position: 0 },
-        { title: 'Nova trilha: Novo Líder', subtitle: 'Desenvolva suas habilidades de liderança', imageUrl: 'https://picsum.photos/seed/course-banner-2/1600/500', linkUrl: '/trilhas', position: 1 },
+        { title: 'Bem-vindo à plataforma', subtitle: 'Explore cursos e trilhas feitos para você', imageUrl: 'https://picsum.photos/seed/course-banner-1/2172/558', position: 0 },
+        { title: 'Nova trilha: Novo Líder', subtitle: 'Desenvolva suas habilidades de liderança', imageUrl: 'https://picsum.photos/seed/course-banner-2/2172/558', linkUrl: '/trilhas', position: 1 },
       ],
     });
   }

@@ -59,7 +59,7 @@ import { valueOf } from '../../shared/utils/resource';
     .metrics { display: grid; grid-template-columns: 2fr repeat(2, 1fr); gap: 1rem; margin: 0; }
     .metrics div { padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
     .metrics .lead { grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between;
-      background: var(--ink); border-color: var(--ink); color: #fff; }
+      background: var(--emphasis); border-color: var(--emphasis); color: var(--on-emphasis); }
     .metrics .lead dd { font-size: 5rem; color: var(--amber); }
     dt { color: inherit; opacity: 0.8; font-weight: 600; }
     dd { margin: 0.375rem 0 0; font: 800 2.25rem/1 var(--font-display); }

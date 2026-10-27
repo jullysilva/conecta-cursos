@@ -21,6 +21,12 @@
   </nav>
 
   <div class="rail-footer">
+    <button type="button" class="switch theme-toggle" role="switch" [attr.aria-checked]="dark()" (click)="toggleTheme()"
+      title="Tema escuro">
+      <i [class]="dark() ? 'ri-moon-line' : 'ri-sun-line'" aria-hidden="true"></i>
+      <span class="label">Tema escuro</span>
+      <span class="label track" aria-hidden="true"><span class="thumb"></span></span>
+    </button>
     <a routerLink="/home" class="switch" title="Ver como aluno">
       <i class="ri-graduation-cap-line" aria-hidden="true"></i><span class="label">Ver como aluno</span>
     </a>

@@ -123,4 +123,29 @@ test.describe('Administração', () => {
     await expect(page.getByText('Aulas concluídas em 30 dias')).toBeVisible();
     await expectAccessible(page);
   });
+
+  test('switches between dark and light themes, keeps the choice and stays accessible', async ({ page }) => {
+    await login(page, ADMIN);
+    const html = page.locator('html');
+    const toggle = page.getByRole('switch', { name: 'Tema escuro' });
+    await expect(html).toHaveClass(/theme-admin-dark/);
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    await expectAccessible(page);
+
+    await page.getByRole('link', { name: 'Usuários' }).click();
+    await expectAccessible(page);
+
+    await toggle.click();
+    await expect(html).not.toHaveClass(/theme-admin-dark/);
+    await expectAccessible(page);
+
+    await page.reload();
+    await expect(page.getByRole('switch', { name: 'Tema escuro' })).toHaveAttribute('aria-checked', 'false');
+    await page.getByRole('switch', { name: 'Tema escuro' }).click();
+    await expect(html).toHaveClass(/theme-admin-dark/);
+
+    await page.getByRole('link', { name: 'Ver como aluno' }).click();
+    await expect(page).toHaveURL(/\/home/);
+    await expect(html).not.toHaveClass(/theme-admin-dark/);
+  });
 });

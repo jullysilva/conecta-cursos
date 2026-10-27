@@ -7,16 +7,9 @@ import { VideoPlayer } from '../../shared/components/video-player';
 import { errorMessage } from '../../shared/utils/http-error';
 import { CourseFrame } from './course-parts/course-frame';
 import { valueOf } from '../../shared/utils/resource';
+import { readStoredFlag, writeStoredFlag } from '../../shared/utils/storage';
 
 const AUTOPLAY_KEY = 'cp.autoplay-next-lesson';
-
-function readAutoplay(): boolean {
-  try {
-    return localStorage.getItem(AUTOPLAY_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
 
 /** Lesson in Mova's layout: course sidebar, player, status badges and pager with autoplay. */
 @Component({
@@ -46,7 +39,7 @@ export class LessonPage {
     stream: ({ params }) => this.learning.course(params),
   });
   protected readonly completed = linkedSignal(() => valueOf(this.lesson)?.progress.completed ?? false);
-  protected readonly autoplay = signal(readAutoplay());
+  protected readonly autoplay = signal(readStoredFlag(AUTOPLAY_KEY));
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.saveOnExit());
@@ -64,11 +57,7 @@ export class LessonPage {
 
   protected toggleAutoplay(value: boolean): void {
     this.autoplay.set(value);
-    try {
-      localStorage.setItem(AUTOPLAY_KEY, value ? '1' : '0');
-    } catch {
-      // Without storage the preference lasts only for this page.
-    }
+    writeStoredFlag(AUTOPLAY_KEY, value);
   }
 
   protected setCompleted(value: boolean): void {

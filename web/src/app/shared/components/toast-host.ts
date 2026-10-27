@@ -21,10 +21,10 @@ import { ToastService } from '../../core/services/toast.service';
     .stack { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 50; display: grid; gap: 0.5rem; }
     .toast { display: flex; align-items: center; gap: 0.625rem; min-width: 280px; max-width: 420px;
       padding: 0.5rem 0.5rem 0.5rem 1rem; border-left: 4px solid var(--forest); border-radius: var(--radius-sm);
-      background: var(--ink); color: #fff; box-shadow: 0 12px 32px rgb(28 43 57 / 25%); }
+      background: var(--emphasis); color: var(--on-emphasis); box-shadow: var(--modal-shadow); }
     .toast.is-error { border-left-color: var(--danger); }
     .toast span { flex: 1; }
-    .toast .btn-ghost { color: #fff; }
+    .toast .btn-ghost { color: var(--on-emphasis); }
   `,
 })
 export class ToastHost {

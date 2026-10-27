@@ -2,16 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, sign
 import { RouterLink } from '@angular/router';
 import type { CourseDetail } from '../../../core/models/models';
 import { formatDuration } from '../../../shared/utils/format';
+import { readStoredFlag, writeStoredFlag } from '../../../shared/utils/storage';
 
 const COLLAPSED_KEY = 'cp.course-sidebar-collapsed';
-
-function readCollapsed(): boolean {
-  try {
-    return localStorage.getItem(COLLAPSED_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Mova's course frame: a fixed, collapsible sidebar with the course outline
@@ -30,7 +23,7 @@ export class CourseFrame {
   /** Lesson being watched, highlighted in the outline and whose module starts open. */
   readonly currentLessonId = input<string | null>(null);
 
-  protected readonly collapsed = signal(readCollapsed());
+  protected readonly collapsed = signal(readStoredFlag(COLLAPSED_KEY));
   protected readonly formatDuration = formatDuration;
 
   /** Lesson number across the whole course, as Mova shows ("Aula 4"). */
@@ -55,11 +48,7 @@ export class CourseFrame {
 
   protected toggleCollapsed(): void {
     this.collapsed.update((value) => !value);
-    try {
-      localStorage.setItem(COLLAPSED_KEY, this.collapsed() ? '1' : '0');
-    } catch {
-      // Storage may be unavailable (private mode); the toggle still works for this page.
-    }
+    writeStoredFlag(COLLAPSED_KEY, this.collapsed());
   }
 
   protected toggleModule(id: string): void {

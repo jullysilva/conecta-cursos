@@ -4,6 +4,7 @@ import type { CourseCard, EnrolledCourse } from '../../core/models/models';
 import { LearningService } from '../../core/services/learning.service';
 import { CarouselCourse, CourseCarousel, ItemsPerPage } from './home-parts/course-carousel';
 import { MovaBanner } from './home-parts/mova-banner';
+import { valueOf } from '../../shared/utils/resource';
 
 const PROGRESS_ROW: ItemsPerPage = { tablet: 2, desktop: 3 };
 const FEATURED_ROW: ItemsPerPage = { tablet: 2, desktop: 1 };
@@ -58,11 +59,11 @@ export class Home {
 
   /** "Continue assistindo" when there is progress, otherwise courses not started yet. */
   protected readonly progressCarousel = computed(() => {
-    const watching = this.summary.value()?.continueWatching ?? [];
+    const watching = valueOf(this.summary)?.continueWatching ?? [];
     if (watching.length) {
       return { title: 'Continue assistindo', anchorId: 'continue-assistindo', courses: watching.map(fromEnrollment) };
     }
-    const notStarted = (this.categories.value() ?? [])
+    const notStarted = (valueOf(this.categories) ?? [])
       .flatMap((category) => category.courses)
       .filter((course) => !course.progress?.completedLessons)
       .slice(0, 9)
@@ -73,12 +74,12 @@ export class Home {
   });
 
   protected readonly featuredCarousel = computed(() => {
-    const course = this.featured.value();
+    const course = valueOf(this.featured);
     return course ? [fromCatalog(course)] : null;
   });
 
   protected readonly categoryCarousels = computed(() =>
-    (this.categories.value() ?? []).map((category) => ({
+    (valueOf(this.categories) ?? []).map((category) => ({
       id: category.id,
       title: category.name,
       anchorId: category.slug,

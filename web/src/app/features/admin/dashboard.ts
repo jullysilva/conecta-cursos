@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { AdminApiService } from '../../core/services/admin-api.service';
+import { valueOf } from '../../shared/utils/resource';
 
 @Component({
   selector: 'cp-dashboard',
@@ -19,7 +20,7 @@ import { AdminApiService } from '../../core/services/admin-api.service';
         </a>
       </header>
 
-      @if (data.value(); as d) {
+      @if (data.hasValue() && data.value(); as d) {
         <dl class="metrics">
           <div class="lead">
             <dt>Aulas concluídas em 30 dias</dt>
@@ -76,6 +77,6 @@ export class Dashboard {
   private readonly api = inject(AdminApiService);
   protected readonly data = rxResource({ stream: () => this.api.dashboard() });
   protected readonly maxEnrollments = computed(() =>
-    Math.max(1, ...(this.data.value()?.topCourses.map((course) => course.enrollments) ?? [])),
+    Math.max(1, ...(valueOf(this.data)?.topCourses.map((course) => course.enrollments) ?? [])),
   );
 }

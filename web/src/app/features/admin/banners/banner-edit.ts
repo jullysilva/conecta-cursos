@@ -6,6 +6,7 @@ import { AdminApiService } from '../../../core/services/admin-api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { fromDateTimeLocal, toDateTimeLocal } from '../../../shared/utils/format';
 import { errorMessage } from '../../../shared/utils/http-error';
+import { valueOf } from '../../../shared/utils/resource';
 
 const NEW_ID = 'novo';
 
@@ -102,7 +103,7 @@ export class BannerEdit {
 
   constructor() {
     effect(() => {
-      const banner = this.banner.value();
+      const banner = valueOf(this.banner);
       if (!banner) return;
       this.form.reset({
         ...banner,

@@ -1,6 +1,6 @@
 <div class="page narrow">
   <a routerLink="/adm/usuarios" class="back"><i class="ri-arrow-left-line" aria-hidden="true"></i> Usuários</a>
-  <h1>{{ isNew() ? 'Novo usuário' : (user.value()?.name ?? 'Usuário') }}</h1>
+  <h1>{{ isNew() ? 'Novo usuário' : ((user.hasValue() ? user.value() : undefined)?.name ?? 'Usuário') }}</h1>
 
   @if (user.error()) {
     <p class="muted" role="alert">Usuário não encontrado.</p>
@@ -51,7 +51,7 @@
       </div>
     </form>
 
-    @if (user.value(); as detail) {
+    @if (user.hasValue() && user.value(); as detail) {
       <section class="panel enrollments" aria-labelledby="enrollments-title">
         <h2 id="enrollments-title">Cursos acessados</h2>
         @if (detail.enrollments.length) {

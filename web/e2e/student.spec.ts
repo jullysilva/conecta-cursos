@@ -23,7 +23,7 @@ test.describe('Jornada do aluno', () => {
   test('profile menu leads to my progress', async ({ page }) => {
     await page.getByRole('button', { name: 'Menu do usuário' }).click();
     await page.getByRole('menuitem', { name: 'Meu perfil' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Meu progresso' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Histórico de cursos' })).toBeVisible();
   });
 
   test('opens a course, completes a lesson and sees progress', async ({ page }) => {
@@ -42,18 +42,46 @@ test.describe('Jornada do aluno', () => {
     await expect(page.getByRole('button', { name: 'Concluída' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('status').filter({ hasText: 'Aula concluída.' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Próxima aula' }).click();
+    await page.getByRole('link', { name: 'Próximo' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Descoberta — Aula 2' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Menu do usuário' }).click();
     await page.getByRole('menuitem', { name: 'Meu perfil' }).click();
-    await expect(page.getByRole('row', { name: /Vendas Consultivas/ })).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Vendas Consultivas' })).toBeVisible();
   });
 
   test('learning paths list and detail', async ({ page }) => {
     await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Trilhas' }).click();
     await page.getByRole('link', { name: /Trilha do Novo Líder/ }).click();
     await expect(page.getByRole('progressbar', { name: 'Progresso na trilha' })).toBeVisible();
+    await expectAccessible(page);
+  });
+
+  test('course page expands modules and the sidebar collapses', async ({ page }) => {
+    await page.goto('/trilhas');
+    await page.getByRole('link', { name: /Trilha do Novo Líder/ }).click();
+    await page.getByRole('link', { name: /Fundamentos da Liderança/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Fundamentos da Liderança' })).toBeVisible();
+    await page.getByRole('button', { name: /Comunicação/ }).filter({ has: page.locator('.module-overlay') }).click();
+    await expect(page.getByRole('region', { name: 'Aulas do módulo' }).getByRole('link')).toHaveCount(3);
+    await expectAccessible(page);
+    await page.getByRole('button', { name: 'Recolher menu' }).click();
+    await expect(page.getByRole('navigation', { name: 'Módulos e aulas' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Expandir menu' }).click();
+  });
+
+  test('lesson page is accessible @tablet', async ({ page }) => {
+    await page.goto('/trilhas');
+    await page.getByRole('link', { name: /Trilha do Novo Líder/ }).click();
+    await page.getByRole('link', { name: /Fundamentos da Liderança/ }).click();
+    await page.locator('.action-cta').click();
+    await expect(page.getByRole('navigation', { name: 'Navegação entre aulas' })).toBeVisible();
+    await expectAccessible(page);
+  });
+
+  test('profile is accessible', async ({ page }) => {
+    await page.goto('/perfil');
+    await expect(page.getByRole('heading', { name: 'Histórico de cursos' })).toBeVisible();
     await expectAccessible(page);
   });
 

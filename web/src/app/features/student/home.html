@@ -1,8 +1,8 @@
-@if (banners.value()?.length) {
-  <cp-mova-banner [slides]="banners.value()!" />
+@if ((banners.hasValue() ? banners.value() : undefined)?.length) {
+  <cp-mova-banner [slides]="(banners.hasValue() ? banners.value() : undefined)!" />
 }
 
-<div class="content" [class.without-banner]="!banners.value()?.length">
+<div class="content" [class.without-banner]="!(banners.hasValue() ? banners.value() : undefined)?.length">
   @if (categories.isLoading()) {
     <div class="skeleton" role="status" aria-label="Carregando cursos">
       <span class="skeleton-title"></span>

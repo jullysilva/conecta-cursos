@@ -1,0 +1,65 @@
+<aside class="sidebar" id="course-sidebar" aria-label="Conteúdo do curso">
+  @if (collapsed()) {
+    <button type="button" class="toggle" aria-controls="course-sidebar" aria-expanded="false" aria-label="Expandir menu"
+      (click)="toggleCollapsed()">
+      <i class="ri-menu-line" aria-hidden="true"></i>
+    </button>
+  } @else {
+    <div class="head">
+      <div class="info">
+        <a class="back" routerLink="/home"><i class="ri-arrow-left-s-line" aria-hidden="true"></i> Voltar para o início</a>
+        <p class="title">{{ course().title }}</p>
+      </div>
+      <button type="button" class="toggle" aria-controls="course-sidebar" aria-expanded="true" aria-label="Recolher menu"
+        (click)="toggleCollapsed()">
+        <i class="ri-menu-line" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="progress">
+      <div class="track" role="progressbar" aria-label="Progresso do curso" aria-valuemin="0" aria-valuemax="100"
+        [attr.aria-valuenow]="course().progress.percent">
+        <div class="fill" [style.width.%]="course().progress.percent"></div>
+      </div>
+      <span class="label">{{ course().progress.percent }}%</span>
+    </div>
+
+    <nav class="nav" aria-label="Módulos e aulas">
+      @for (module of course().modules; track module.id) {
+        <div class="module" [class.is-open]="openModules().has(module.id)">
+          <button type="button" class="module-header" (click)="toggleModule(module.id)"
+            [attr.aria-expanded]="openModules().has(module.id)" [attr.aria-controls]="'side-module-' + module.id">
+            <span class="module-title">{{ module.title }}</span>
+            <i class="ri-arrow-right-s-line chevron" aria-hidden="true"></i>
+          </button>
+          @if (openModules().has(module.id)) {
+            <ul class="lessons" [id]="'side-module-' + module.id">
+              @for (lesson of module.lessons; track lesson.id) {
+                <li class="lesson" [class.is-completed]="lesson.completed" [class.is-selected]="lesson.id === currentLessonId()">
+                  <a class="lesson-link" [routerLink]="['/aula', lesson.id]"
+                    [attr.aria-current]="lesson.id === currentLessonId() ? 'page' : null">
+                    <i class="ri-check-line check" aria-hidden="true"></i>
+                    <i class="ri-play-circle-line icon" aria-hidden="true"></i>
+                    <span class="lesson-body">
+                      <span class="lesson-number">Aula {{ lessonNumbers().get(lesson.id) }}</span>
+                      <span class="lesson-title">{{ lesson.title }}</span>
+                      @if (lesson.durationSec) {
+                        <span class="lesson-subtitle"><i class="ri-time-line" aria-hidden="true"></i> {{ formatDuration(lesson.durationSec) }}</span>
+                      }
+                    </span>
+                    @if (lesson.completed) {
+                      <span class="sr-only">(concluída)</span>
+                    }
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </nav>
+  }
+</aside>
+
+<div class="main">
+  <ng-content />
+</div>

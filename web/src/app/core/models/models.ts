@@ -73,7 +73,7 @@ export interface ModuleOutline {
 }
 
 export interface CourseDetail extends CourseCard {
-  category: { id: string; name: string } | null;
+  category: { id: string; name: string; slug: string } | null;
   modules: ModuleOutline[];
   progress: CourseProgress;
   nextLessonId: string | null;

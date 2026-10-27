@@ -8,6 +8,7 @@ import { ToastService } from '../../core/services/toast.service';
 import type { Category } from '../../core/models/admin.models';
 import { EmptyState } from '../../shared/components/empty-state';
 import { errorMessage } from '../../shared/utils/http-error';
+import { valueOf } from '../../shared/utils/resource';
 
 @Component({
   selector: 'cp-categories',
@@ -31,7 +32,7 @@ import { errorMessage } from '../../shared/utils/http-error';
         </button>
       </form>
 
-      @if (categories.value(); as list) {
+      @if (categories.hasValue() && categories.value(); as list) {
         @if (list.length) {
           <div class="panel">
             <table class="table">
@@ -91,7 +92,7 @@ export class Categories {
 
   protected create(): void {
     const name = this.newName().trim();
-    const position = this.categories.value()?.length ?? 0;
+    const position = valueOf(this.categories)?.length ?? 0;
     this.run(this.api.createCategory({ name, position }), 'Categoria adicionada.');
     this.newName.set('');
   }

@@ -1,8 +1,8 @@
 <header class="header">
   <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <nav class="navbar" aria-label="Principal">
-    <a class="brand" routerLink="/home" aria-label="Campus, página inicial">
-      Campus<sup aria-hidden="true">●</sup>
+    <a class="brand" routerLink="/home" [attr.aria-label]="brandName + ', página inicial'">
+      <cp-brand-mark [size]="40" />
     </a>
 
     <ul class="nav">

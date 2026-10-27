@@ -3,6 +3,8 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
 import { initials } from '../shared/utils/format';
 import { readStoredFlag, writeStoredFlag } from '../shared/utils/storage';
+import { BRAND_NAME } from '../shared/brand';
+import { BrandMark } from '../shared/components/brand-mark';
 
 interface NavItem {
   label: string;
@@ -28,12 +30,13 @@ const ADMIN_NAV: NavItem[] = [
 @Component({
   selector: 'cp-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BrandMark],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })
 export class Shell {
   protected readonly auth = inject(AuthService);
+  protected readonly brandName = BRAND_NAME;
   protected readonly nav = ADMIN_NAV;
   protected readonly userInitials = computed(() => initials(this.auth.user()?.name ?? ''));
   protected readonly dark = signal(readStoredFlag(ADMIN_DARK_KEY, true));

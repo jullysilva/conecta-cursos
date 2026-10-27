@@ -5,6 +5,8 @@ import { filter, map } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { LearningService } from '../core/services/learning.service';
 import { valueOf } from '../shared/utils/resource';
+import { BRAND_NAME } from '../shared/brand';
+import { BrandMark } from '../shared/components/brand-mark';
 
 /**
  * Student frame in Mova's style: fixed black header with section anchors and
@@ -13,7 +15,7 @@ import { valueOf } from '../shared/utils/resource';
 @Component({
   selector: 'cp-mova-layout',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BrandMark],
   templateUrl: './mova-layout.html',
   styleUrl: './mova-layout.scss',
   host: {
@@ -26,6 +28,7 @@ import { valueOf } from '../shared/utils/resource';
 export class MovaLayout {
   private readonly learning = inject(LearningService);
   protected readonly auth = inject(AuthService);
+  protected readonly brandName = BRAND_NAME;
 
   private readonly router = inject(Router);
 

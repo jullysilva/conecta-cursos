@@ -8,7 +8,7 @@ Sync Impact Report
 - Pendências: nenhuma
 -->
 
-# Constituição do Campus (course-platform)
+# Constituição do Conecta Cursos (course-platform)
 
 Plataforma de cursos (LMS) pessoal, inspirada no Mova. Monorepo com `api/` (NestJS + Prisma) e
 `web/` (Angular). Esta constituição vale para toda spec, plano, tarefa e implementação feita com

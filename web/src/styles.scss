@@ -1,15 +1,17 @@
 @use 'sass:meta';
 
 :root {
-  --ink: #1c2b39;
-  --ink-soft: #4a5a68;
-  --ink-faint: #5d6b77;
-  --paper: #f4f7f6;
+  /* Conecta Cursos greens (from the logo): deep #0c6c3c, mid #309c48, lime #84c048. */
+  --ink: #16261c;
+  --ink-soft: #46574c;
+  --ink-faint: #59695e;
+  --paper: #f3f7f3;
   --surface: #ffffff;
-  --line: #d9e1de;
-  --forest: #1f6f5c;
-  --forest-strong: #175646;
-  --forest-tint: #e3f0eb;
+  --line: #d6e2d9;
+  --forest: #0c6c3c;
+  --forest-strong: #08502c;
+  --forest-tint: #e2f1e5;
+  --brand-lime: #84c048;
   --amber: #e9a23b;
   --amber-tint: #fbf0dc;
   --danger: #c2412d;
@@ -20,11 +22,11 @@
   --fill-primary: var(--forest);
   --fill-primary-hover: var(--forest-strong);
   --fill-danger: var(--danger);
-  --emphasis: #1c2b39;
+  --emphasis: #0e3b25;
   --on-emphasis: #ffffff;
-  --hover-tint: rgb(28 43 57 / 6%);
-  --modal-shadow: 0 24px 64px rgb(28 43 57 / 25%);
-  --modal-backdrop: rgb(28 43 57 / 45%);
+  --hover-tint: rgb(14 59 37 / 6%);
+  --modal-shadow: 0 24px 64px rgb(14 59 37 / 25%);
+  --modal-backdrop: rgb(14 59 37 / 45%);
 
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-body: 'Source Sans 3', system-ui, sans-serif;
@@ -33,7 +35,7 @@
   --radius-md: 10px;
   --radius-lg: 18px;
   --rail-width: 232px;
-  --focus: 0 0 0 3px rgb(31 111 92 / 35%);
+  --focus: 0 0 0 3px rgb(12 108 60 / 35%);
   color-scheme: light;
 }
 

@@ -1,9 +1,9 @@
-# Campus — plataforma de cursos
+# Conecta Cursos — plataforma de cursos
 
 LMS corporativo inspirado no Mova (engenharia reversa das rotas, da API e do CSS públicos).
 A área do aluno segue o design do Mova (tema escuro, header fixo com barra de progresso, banner em
-tela cheia e carrosséis de cards em pôster), com nome e logotipo próprios. O painel admin tem tema
-próprio, escuro por padrão, com alternância para o claro. Suporte a **PC e tablet** (sem layout mobile).
+tela cheia e carrosséis de cards em pôster), com o nome e a logo do Conecta Cursos. O painel admin usa os
+verdes da logo, escuro por padrão, com alternância para o claro. Suporte a **PC e tablet** (sem layout mobile).
 
 | Pasta | Stack |
 |---|---|

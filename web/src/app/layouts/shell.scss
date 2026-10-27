@@ -1,8 +1,8 @@
 :host {
-  --rail-bg: #22323f;
-  --rail-ink: #dfe7ec;
+  --rail-bg: var(--emphasis);
+  --rail-ink: #dcebe0;
   --rail-ink-strong: #fff;
-  --rail-ink-faint: #9fb0bc;
+  --rail-ink-faint: #a3c4ad;
   --rail-hover: rgb(255 255 255 / 8%);
   --rail-active: rgb(255 255 255 / 10%);
   --rail-divider: rgb(255 255 255 / 12%);
@@ -40,38 +40,25 @@
 }
 
 :host-context(html.theme-admin-dark) {
-  --rail-bg: #0b1215;
-  --rail-ink: #c9d5dc;
+  --rail-bg: #0a120d;
+  --rail-ink: #c9dccf;
   --rail-hover: rgb(255 255 255 / 6%);
-  --rail-active: rgb(92 196 165 / 14%);
-  --rail-divider: #222f37;
+  --rail-active: rgb(132 192 72 / 14%);
+  --rail-divider: #1f2b23;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
   padding: 0 0.5rem;
   color: var(--rail-ink-strong);
   text-decoration: none;
-  font: 800 1.375rem/1 var(--font-display);
-  letter-spacing: -0.02em;
-
-  .mark {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 9px 9px 9px 2px;
-    background: var(--amber);
-    color: #1c2b39;
-  }
 }
 
 .area-label {
   margin-top: -0.75rem;
   padding: 0 0.5rem;
-  color: var(--amber);
+  color: var(--brand-lime);
   font-size: 0.8125rem;
   font-weight: 700;
 }
@@ -113,7 +100,7 @@ nav a,
 nav a.is-active {
   background: var(--rail-active);
   color: var(--rail-ink-strong);
-  box-shadow: inset 3px 0 0 var(--amber);
+  box-shadow: inset 3px 0 0 var(--brand-lime);
 }
 
 .rail-footer {
@@ -222,6 +209,7 @@ main {
 
   .brand {
     padding: 0;
+    --brand-name-display: none;
   }
 
   .user {

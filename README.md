@@ -2,8 +2,8 @@
 
 LMS corporativo inspirado no Mova (engenharia reversa das rotas, da API e do CSS públicos).
 A área do aluno segue o design do Mova (tema escuro, header fixo com barra de progresso, banner em
-tela cheia e carrosséis de cards em pôster), com nome e logotipo próprios. O painel admin mantém
-o tema claro. Suporte a **PC e tablet** (sem layout mobile).
+tela cheia e carrosséis de cards em pôster), com nome e logotipo próprios. O painel admin tem tema
+próprio, escuro por padrão, com alternância para o claro. Suporte a **PC e tablet** (sem layout mobile).
 
 | Pasta | Stack |
 |---|---|
@@ -34,6 +34,18 @@ E-mails de recuperação de senha vão para o SMTP configurado (padrão: MailHog
 | `web: npm run e2e` | Interface com Playwright + axe (WCAG A/AA), em PC e tablet, numa stack isolada (API :3101 + web :4301 + banco de teste reseedado) |
 
 O reset do banco de teste (`api/prisma/reset-test-db.ts`) recusa qualquer banco cujo nome não termine em `_test`.
+
+## Spec-driven development (spec-kit)
+
+O projeto usa o [GitHub Spec Kit](https://github.com/github/spec-kit). Os princípios ficam em
+`.specify/memory/constitution.md`, e cada feature ganha sua pasta em `specs/NNN-nome/`. No
+Claude Code, o fluxo é:
+
+1. `/speckit-specify <descrição>`: escreve a spec, o que e por quê;
+2. `/speckit-clarify` (opcional): tira dúvidas antes do plano;
+3. `/speckit-plan`: gera o plano técnico, com checagem da constituição;
+4. `/speckit-tasks`: gera as tarefas; `/speckit-analyze` (opcional) confere a consistência;
+5. `/speckit-implement`: executa as tarefas; `/speckit-taskstoissues` cria as issues.
 
 ## Funcionalidades
 

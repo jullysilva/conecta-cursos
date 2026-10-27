@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service.js';
@@ -31,6 +31,8 @@ export function toPublicUser(user: User): PublicUser {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
@@ -74,6 +76,16 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.active) throw new UnauthorizedException();
     return toPublicUser(user);
+  }
+
+  /**
+   * Starts a password reset without waiting for it: the response takes the same time whether
+   * or not the e-mail exists (no account enumeration) and never waits on the SMTP server.
+   */
+  requestPasswordReset(email: string): void {
+    this.forgotPassword(email).catch((error: unknown) =>
+      this.logger.error('Failed to process password reset request', error as Error),
+    );
   }
 
   async forgotPassword(email: string): Promise<string | null> {

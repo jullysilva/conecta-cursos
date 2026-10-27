@@ -9,6 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import type { Role } from '../../../core/models/models';
 import type { UserPayload } from '../../../core/models/admin.models';
 import { errorMessage } from '../../../shared/utils/http-error';
+import { valueOf } from '../../../shared/utils/resource';
 
 const NEW_ID = 'novo';
 
@@ -56,7 +57,7 @@ export class UserEdit {
   constructor() {
     effect(() => {
       if (this.isNew()) this.form.controls.password.addValidators(Validators.required);
-      const user = this.user.value();
+      const user = valueOf(this.user);
       if (user) this.form.reset({ ...user, password: '' });
       // Admins cannot demote or deactivate themselves (also enforced by the API).
       for (const control of [this.form.controls.role, this.form.controls.active]) {

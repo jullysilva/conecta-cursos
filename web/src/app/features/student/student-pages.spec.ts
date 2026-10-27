@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { LearningService } from '../../core/services/learning.service';
@@ -25,7 +25,7 @@ const summary: StudentSummary = {
 
 const course: CourseDetail = {
   id: 'c1', title: 'Liderança', slug: 'lideranca', description: 'Desc', thumbnailUrl: null, workloadHours: 2,
-  category: { id: 'cat', name: 'Gestão' }, progress: progress(25), nextLessonId: 'l2',
+  category: { id: 'cat', name: 'Gestão', slug: 'gestao' }, progress: progress(25), nextLessonId: 'l2',
   modules: [{ id: 'm1', title: 'Início', position: 0, lessons: [
     { id: 'l1', title: 'Aula 1', durationSec: 60, position: 0, completed: true },
     { id: 'l2', title: 'Aula 2', durationSec: 90, position: 1, completed: false },
@@ -63,42 +63,94 @@ function setup(overrides: Partial<Record<keyof LearningService, unknown>> = {}) 
 }
 
 describe('Home', () => {
-  it('greets the student and offers to resume the last lesson', async () => {
-    setup();
+  it('shows the banner, continue watching, featured and category rows', async () => {
+    setup({ featuredCourse: vi.fn(() => of({ ...course, progress: progress(0) })) });
     const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('h1')?.textContent).toContain('Olá, Ana');
-    expect(el.textContent).toContain('Continue de onde parou');
-    expect(el.querySelector('.resume a')?.getAttribute('href')).toBe('/aula/l2');
-    expect(el.textContent).toContain('Gestão');
-    expect(el.textContent).toContain('Trilha');
+    expect(el.querySelector('cp-mova-banner')).not.toBeNull();
+    const titles = Array.from(el.querySelectorAll('h2')).map((h) => h.textContent?.trim());
+    expect(titles).toEqual(['Continue assistindo', 'Em destaque', 'Gestão']);
+    // Continue watching resumes from the last lesson.
+    expect(el.querySelector('.progress-row .info-cta')?.getAttribute('href')).toBe('/aula/l2');
+    expect(el.querySelector('#gestao')).not.toBeNull();
+  });
+
+  it('recommends courses not started when there is nothing to continue', async () => {
+    setup({ summary: vi.fn(() => of({ ...summary, continueWatching: [] })) });
+    const fixture = TestBed.createComponent(Home);
+    await fixture.whenStable();
+    const titles = Array.from(fixture.nativeElement.querySelectorAll('h2')).map((h) => (h as HTMLElement).textContent?.trim());
+    expect(titles[0]).toBe('Recomendados para você');
+  });
+
+  it('still shows the catalog when the progress summary fails', async () => {
+    setup({ summary: vi.fn(() => throwError(() => new Error('500'))) });
+    const fixture = TestBed.createComponent(Home);
+    await fixture.whenStable();
+    const titles = Array.from(fixture.nativeElement.querySelectorAll('h2')).map((h) => (h as HTMLElement).textContent?.trim());
+    expect(titles).toEqual(['Recomendados para você', 'Gestão']);
   });
 
   it('shows a retry when the catalog fails to load', async () => {
-    setup({ categories: vi.fn(() => throwError(() => new Error('offline'))) });
+    const categories = vi.fn(() => throwError(() => new Error('offline')) as ReturnType<LearningService['categories']>);
+    setup({ categories });
     const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Não foi possível carregar os cursos');
+    expect(fixture.nativeElement.textContent).toContain('Não foi possível carregar seus cursos.');
+    categories.mockReturnValue(of([]));
+    (fixture.nativeElement.querySelector('.empty button') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent).toContain('Você ainda não tem cursos disponíveis.');
   });
 });
 
 describe('CoursePage', () => {
-  it('renders the outline, completion marks and the continue CTA', async () => {
+  it('shows the hero, the continue action and the course outline in the sidebar', async () => {
     setup();
     const fixture = TestBed.createComponent(CoursePage);
     fixture.componentRef.setInput('idCourse', 'c1');
     await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('h1')?.textContent).toContain('Liderança');
-    expect(el.querySelector('.hero .btn-primary')?.textContent).toContain('Continuar curso');
-    expect(el.querySelectorAll('.lessons a.is-done')).toHaveLength(1);
+    expect(el.querySelector('.hero-title')?.textContent).toContain('Liderança');
+    expect(el.querySelector('.mova-breadcrumb a[href="/home#gestao"]')?.textContent).toContain('Gestão');
+    expect(el.querySelector('.action-title')?.textContent).toContain('Continue de onde parou');
+    expect(el.querySelector('.action-cta')?.getAttribute('href')).toBe('/aula/l2');
+    expect(el.querySelectorAll('cp-course-frame .lesson.is-completed')).toHaveLength(1);
+    expect(el.querySelector('.lesson-number')?.textContent).toContain('Aula 1');
+  });
 
-    const toggle = el.querySelector<HTMLButtonElement>('.module-toggle')!;
-    toggle.click();
+  it('expands a module into lesson cards and closes it again', async () => {
+    setup();
+    const fixture = TestBed.createComponent(CoursePage);
+    fixture.componentRef.setInput('idCourse', 'c1');
     await fixture.whenStable();
-    expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(el.querySelector('.lessons')).toBeNull();
+    const el: HTMLElement = fixture.nativeElement;
+    const card = el.querySelector<HTMLButtonElement>('.module-card')!;
+    expect(card.querySelector('.module-meta')?.textContent).toContain('1 de 2 aulas concluídas');
+    card.click();
+    await fixture.whenStable();
+    expect(card.getAttribute('aria-expanded')).toBe('true');
+    expect(el.querySelectorAll('.lesson-card')).toHaveLength(2);
+    expect(el.querySelector('.lesson-card .lesson-meta')?.textContent).toContain('1:00, concluída');
+    el.querySelector<HTMLButtonElement>('.expanded-close')!.click();
+    await fixture.whenStable();
+    expect(el.querySelector('.expanded')).toBeNull();
+  });
+
+  it('highlights the start action for a course not started and shows done when finished', async () => {
+    setup({ course: vi.fn(() => of({ ...course, progress: progress(0) })) });
+    const fresh = TestBed.createComponent(CoursePage);
+    fresh.componentRef.setInput('idCourse', 'c1');
+    await fresh.whenStable();
+    expect(fresh.nativeElement.querySelector('.action--highlight .action-cta')?.textContent).toContain('Começar curso');
+
+    TestBed.resetTestingModule();
+    setup({ course: vi.fn(() => of({ ...course, progress: progress(100) })) });
+    const done = TestBed.createComponent(CoursePage);
+    done.componentRef.setInput('idCourse', 'c1');
+    await done.whenStable();
+    expect(done.nativeElement.querySelector('.action-title')?.textContent).toContain('Curso concluído');
   });
 
   it('shows not found on error', async () => {
@@ -111,46 +163,66 @@ describe('CoursePage', () => {
 });
 
 describe('LessonPage', () => {
-  it('marks the lesson as completed and refreshes the outline', async () => {
-    const learning = setup();
+  beforeEach(() => localStorage.clear());
+
+  async function render(overrides: Parameters<typeof setup>[0] = {}) {
+    const learning = setup(overrides);
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     const fixture = TestBed.createComponent(LessonPage);
     fixture.componentRef.setInput('idLesson', 'l2');
     await fixture.whenStable();
-    const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('h1')?.textContent).toContain('Aula 2');
-    expect(el.textContent).toContain('Módulo 1: Início');
-    expect(el.querySelector('a[aria-current=page]')?.textContent).toContain('Aula 2');
+    return { learning, navigate, fixture, el: fixture.nativeElement as HTMLElement };
+  }
 
-    const button = el.querySelector<HTMLButtonElement>('.lesson-head .btn')!;
+  it('marks the lesson as completed and refreshes the outline', async () => {
+    const { learning, fixture, el } = await render();
+    expect(el.querySelector('h1')?.textContent).toContain('Aula 2');
+    expect(el.querySelector('.lesson.is-selected')?.textContent).toContain('Aula 2');
+    expect(el.querySelector('.badge--status')?.textContent).toContain('Não concluída');
+
+    const button = el.querySelector<HTMLButtonElement>('.tools .btn')!;
     button.click();
     await fixture.whenStable();
     expect(learning.saveProgress).toHaveBeenCalledWith('l2', 0, true);
     expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(el.querySelector('.badge--done')).not.toBeNull();
     expect(learning.course).toHaveBeenCalledTimes(2);
-    // Last lesson + completed: offer the way back to the course.
-    expect(el.querySelector('.pager .next')?.textContent).toContain('Voltar ao curso');
+    // Last lesson: the pager leads back to the course.
+    expect(el.querySelector('.pager-btn--next')?.textContent).toContain('Voltar ao curso');
   });
 
   it('reverts the toggle when saving fails', async () => {
-    setup({ saveProgress: vi.fn(() => throwError(() => new Error('fail'))) });
-    const fixture = TestBed.createComponent(LessonPage);
-    fixture.componentRef.setInput('idLesson', 'l2');
-    await fixture.whenStable();
-    const button = fixture.nativeElement.querySelector('.lesson-head .btn') as HTMLButtonElement;
+    const { fixture, el } = await render({ saveProgress: vi.fn(() => throwError(() => new Error('fail'))) });
+    const button = el.querySelector<HTMLButtonElement>('.tools .btn')!;
     button.click();
     await fixture.whenStable();
     expect(button.getAttribute('aria-pressed')).toBe('false');
   });
+
+  it('remembers autoplay and advances to the next lesson when the video ends', async () => {
+    const { fixture, el, navigate } = await render({ lesson: vi.fn(() => of({ ...lesson, nextLessonId: 'l3' })) });
+    const toggle = el.querySelector<HTMLInputElement>('.autoplay-input')!;
+    toggle.click();
+    await fixture.whenStable();
+    expect(localStorage.getItem('cp.autoplay-next-lesson')).toBe('1');
+    expect(el.querySelector('.autoplay--on')).not.toBeNull();
+
+    (fixture.componentInstance as unknown as { onEnded(): void }).onEnded();
+    expect(navigate).toHaveBeenCalledWith(['/aula', 'l3']);
+  });
 });
 
 describe('Profile', () => {
-  it('lists stats and enrolled courses', async () => {
+  it('shows the identity card and the course history', async () => {
     setup();
+    TestBed.overrideProvider(AuthService, { useValue: { user: () => ({ name: 'Ana Souza', email: 'ana@x.com' }), logout: vi.fn() } });
     const fixture = TestBed.createComponent(Profile);
     await fixture.whenStable();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('.stats')?.textContent).toContain('Aulas concluídas');
-    expect(el.querySelector('tbody a')?.getAttribute('href')).toBe('/curso/c1');
-    expect(el.textContent).toContain('Continuar');
+    expect(el.querySelector('.name')?.textContent).toContain('Ana Souza');
+    expect(el.querySelector('.badge')?.textContent).toContain('1 aula concluída');
+    expect(el.querySelector('.status')?.textContent).toContain('Em andamento');
+    expect(el.querySelector('.card .action')?.getAttribute('href')).toBe('/aula/l2');
   });
 });

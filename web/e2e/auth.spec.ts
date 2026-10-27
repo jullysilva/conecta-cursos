@@ -28,8 +28,9 @@ test.describe('Autenticação', () => {
   test('session survives a reload and ends on logout', async ({ page }) => {
     await login(page, STUDENT);
     await page.reload();
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Olá');
-    await page.getByRole('button', { name: 'Sair da conta' }).click();
+    await expect(page.getByRole('heading', { name: 'Continue assistindo' }).or(page.getByRole('heading', { name: 'Recomendados para você' }))).toBeVisible();
+    await page.getByRole('button', { name: 'Menu do usuário' }).click();
+    await page.getByRole('menuitem', { name: 'Sair' }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.goto('/home');
     await expect(page).toHaveURL(/\/login/);

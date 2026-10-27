@@ -2,12 +2,12 @@
   <a routerLink="/adm/cursos" class="back"><i class="ri-arrow-left-line" aria-hidden="true"></i> Cursos</a>
   <header class="page-head">
     <div>
-      <h1>{{ isNew() ? 'Novo curso' : (course.value()?.title ?? 'Curso') }}</h1>
+      <h1>{{ isNew() ? 'Novo curso' : ((course.hasValue() ? course.value() : undefined)?.title ?? 'Curso') }}</h1>
       @if (isNew()) {
         <p>Preencha os dados básicos. Módulos e aulas ficam disponíveis depois de salvar.</p>
       }
     </div>
-    @if (!isNew() && course.value(); as current) {
+    @if (!isNew() && course.hasValue() && course.value(); as current) {
       <a class="btn btn-secondary" [routerLink]="['/curso', current.id]">
         <i class="ri-eye-line" aria-hidden="true"></i> Ver como aluno
       </a>
@@ -36,7 +36,7 @@
             <label for="category">Categoria</label>
             <select id="category" class="input" formControlName="categoryId">
               <option [ngValue]="null">Sem categoria</option>
-              @for (category of categories.value() ?? []; track category.id) {
+              @for (category of (categories.hasValue() ? categories.value() : undefined) ?? []; track category.id) {
                 <option [ngValue]="category.id">{{ category.name }}</option>
               }
             </select>
@@ -64,7 +64,7 @@
       </form>
 
       @if (!isNew()) {
-        @if (course.value(); as current) {
+        @if (course.hasValue() && course.value(); as current) {
           <cp-course-content [course]="current" (changed)="course.reload()" />
         }
       }

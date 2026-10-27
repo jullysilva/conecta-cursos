@@ -2,15 +2,38 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal } f
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { LearningService } from '../../core/services/learning.service';
-import { CourseCover } from '../../shared/components/course-cover';
-import { EmptyState } from '../../shared/components/empty-state';
-import { ProgressRail } from '../../shared/components/progress-rail';
 import { formatDuration } from '../../shared/utils/format';
+import { CourseFrame } from './course-parts/course-frame';
+import { valueOf } from '../../shared/utils/resource';
 
+type CourseStage = 'start' | 'continue' | 'done';
+
+const ACTION_COPY: Record<CourseStage, { title: string; subtitle: string; cta: string; icon: string }> = {
+  start: {
+    title: 'Comece por aqui',
+    subtitle: 'Este botão abre a primeira aula do curso. Depois, ele leva você direto para onde parou.',
+    cta: 'Começar curso',
+    icon: 'ri-play-fill',
+  },
+  continue: {
+    title: 'Continue de onde parou',
+    subtitle: 'Retome a última aula que você assistiu.',
+    cta: 'Continuar',
+    icon: 'ri-play-fill',
+  },
+  done: {
+    title: 'Curso concluído',
+    subtitle: 'Reveja qualquer aula quando quiser.',
+    cta: 'Rever aulas',
+    icon: 'ri-check-line',
+  },
+};
+
+/** Course overview in Mova's layout: hero, call to action, presentation and module grid. */
 @Component({
   selector: 'cp-course-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CourseCover, EmptyState, ProgressRail],
+  imports: [RouterLink, CourseFrame],
   templateUrl: './course-page.html',
   styleUrl: './course-page.scss',
 })
@@ -24,27 +47,27 @@ export class CoursePage {
     params: () => this.idCourse(),
     stream: ({ params }) => this.learning.course(params),
   });
-  protected readonly collapsed = signal<ReadonlySet<string>>(new Set());
+  /** Module whose lessons are expanded below the module grid. */
+  protected readonly expandedModuleId = signal<string | null>(null);
   protected readonly formatDuration = formatDuration;
 
-  protected readonly totalDuration = computed(() =>
-    (this.course.value()?.modules ?? [])
-      .flatMap((module) => module.lessons)
-      .reduce((sum, lesson) => sum + lesson.durationSec, 0),
+  protected readonly stage = computed<CourseStage>(() => {
+    const progress = valueOf(this.course)?.progress;
+    if (!progress || progress.completedLessons === 0) return 'start';
+    return progress.percent === 100 ? 'done' : 'continue';
+  });
+  protected readonly action = computed(() => ACTION_COPY[this.stage()]);
+
+  protected readonly expandedModule = computed(
+    () => valueOf(this.course)?.modules.find((module) => module.id === this.expandedModuleId()) ?? null,
   );
 
-  protected readonly ctaLabel = computed(() => {
-    const progress = this.course.value()?.progress;
-    if (!progress || progress.completedLessons === 0) return 'Começar curso';
-    return progress.percent === 100 ? 'Rever curso' : 'Continuar curso';
-  });
+  protected toggleModule(id: string): void {
+    this.expandedModuleId.update((current) => (current === id ? null : id));
+  }
 
-  protected toggle(moduleId: string): void {
-    this.collapsed.update((current) => {
-      const next = new Set(current);
-      if (next.has(moduleId)) next.delete(moduleId);
-      else next.add(moduleId);
-      return next;
-    });
+  protected completedIn(moduleId: string): number {
+    const module = valueOf(this.course)?.modules.find((item) => item.id === moduleId);
+    return module?.lessons.filter((lesson) => lesson.completed).length ?? 0;
   }
 }

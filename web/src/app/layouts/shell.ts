@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, DOCUMENT, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
 import { initials } from '../shared/utils/format';
+import { readStoredFlag, writeStoredFlag } from '../shared/utils/storage';
 
 interface NavItem {
   label: string;
@@ -10,11 +11,9 @@ interface NavItem {
   exact?: boolean;
 }
 
-const STUDENT_NAV: NavItem[] = [
-  { label: 'Início', icon: 'ri-home-5-line', link: '/home' },
-  { label: 'Trilhas', icon: 'ri-route-line', link: '/trilhas' },
-  { label: 'Meu progresso', icon: 'ri-user-3-line', link: '/perfil' },
-];
+/** Admin theme preference; dark is the default. */
+export const ADMIN_DARK_KEY = 'cp.admin-dark-theme';
+export const ADMIN_DARK_CLASS = 'theme-admin-dark';
 
 const ADMIN_NAV: NavItem[] = [
   { label: 'Visão geral', icon: 'ri-dashboard-3-line', link: '/adm', exact: true },
@@ -25,7 +24,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: 'Usuários', icon: 'ri-team-line', link: '/adm/usuarios' },
 ];
 
-/** Application frame: navigation rail + routed content, for both student and admin areas. */
+/** Admin frame: navigation rail + routed content. The student area uses MovaLayout. */
 @Component({
   selector: 'cp-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,9 +34,19 @@ const ADMIN_NAV: NavItem[] = [
 })
 export class Shell {
   protected readonly auth = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
-
-  protected readonly isAdminArea = this.route.snapshot.data['area'] === 'admin';
-  protected readonly nav = this.isAdminArea ? ADMIN_NAV : STUDENT_NAV;
+  protected readonly nav = ADMIN_NAV;
   protected readonly userInitials = computed(() => initials(this.auth.user()?.name ?? ''));
+  protected readonly dark = signal(readStoredFlag(ADMIN_DARK_KEY, true));
+
+  constructor() {
+    // The class lives on <html> so the body, dialogs and toasts share the admin theme.
+    const root = inject(DOCUMENT).documentElement;
+    effect(() => root.classList.toggle(ADMIN_DARK_CLASS, this.dark()));
+    inject(DestroyRef).onDestroy(() => root.classList.remove(ADMIN_DARK_CLASS));
+  }
+
+  protected toggleTheme(): void {
+    this.dark.update((value) => !value);
+    writeStoredFlag(ADMIN_DARK_KEY, this.dark());
+  }
 }

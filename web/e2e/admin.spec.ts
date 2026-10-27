@@ -31,7 +31,9 @@ test.describe('Administração', () => {
     const studentContext = await browser.newContext();
     const student = await studentContext.newPage();
     await login(student, STUDENT);
-    await student.getByRole('link', { name: new RegExp(title) }).first().click();
+    const card = student.getByRole('button', { name: title }).first();
+    await card.click();
+    await student.locator(`#${await card.getAttribute('aria-controls')}`).getByRole('link', { name: 'Iniciar' }).click();
     await student.getByRole('link', { name: 'Começar curso' }).click();
     await expect(student.getByRole('heading', { level: 1, name: 'Boas-vindas' })).toBeVisible();
     await expect(student.locator('iframe[src*="youtube-nocookie.com/embed/aqz-KE-bpKQ"]')).toBeAttached();
@@ -120,5 +122,30 @@ test.describe('Administração', () => {
     await login(page, ADMIN);
     await expect(page.getByText('Aulas concluídas em 30 dias')).toBeVisible();
     await expectAccessible(page);
+  });
+
+  test('switches between dark and light themes, keeps the choice and stays accessible', async ({ page }) => {
+    await login(page, ADMIN);
+    const html = page.locator('html');
+    const toggle = page.getByRole('switch', { name: 'Tema escuro' });
+    await expect(html).toHaveClass(/theme-admin-dark/);
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    await expectAccessible(page);
+
+    await page.getByRole('link', { name: 'Usuários' }).click();
+    await expectAccessible(page);
+
+    await toggle.click();
+    await expect(html).not.toHaveClass(/theme-admin-dark/);
+    await expectAccessible(page);
+
+    await page.reload();
+    await expect(page.getByRole('switch', { name: 'Tema escuro' })).toHaveAttribute('aria-checked', 'false');
+    await page.getByRole('switch', { name: 'Tema escuro' }).click();
+    await expect(html).toHaveClass(/theme-admin-dark/);
+
+    await page.getByRole('link', { name: 'Ver como aluno' }).click();
+    await expect(page).toHaveURL(/\/home/);
+    await expect(html).not.toHaveClass(/theme-admin-dark/);
   });
 });

@@ -1,27 +1,21 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  computed,
-  inject,
-  input,
-  linkedSignal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LearningService } from '../../core/services/learning.service';
 import { ToastService } from '../../core/services/toast.service';
-import { EmptyState } from '../../shared/components/empty-state';
-import { ProgressRail } from '../../shared/components/progress-rail';
 import { VideoPlayer } from '../../shared/components/video-player';
-import { formatDuration } from '../../shared/utils/format';
 import { errorMessage } from '../../shared/utils/http-error';
+import { CourseFrame } from './course-parts/course-frame';
+import { valueOf } from '../../shared/utils/resource';
+import { readStoredFlag, writeStoredFlag } from '../../shared/utils/storage';
 
+const AUTOPLAY_KEY = 'cp.autoplay-next-lesson';
+
+/** Lesson in Mova's layout: course sidebar, player, status badges and pager with autoplay. */
 @Component({
   selector: 'cp-lesson-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, EmptyState, ProgressRail, VideoPlayer],
+  imports: [RouterLink, CourseFrame, VideoPlayer],
   templateUrl: './lesson-page.html',
   styleUrl: './lesson-page.scss',
   host: { '(window:beforeunload)': 'saveOnExit()' },
@@ -29,6 +23,7 @@ import { errorMessage } from '../../shared/utils/http-error';
 export class LessonPage {
   private readonly learning = inject(LearningService);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   /** Bound from the route parameter :idLesson. */
   readonly idLesson = input.required<string>();
@@ -40,17 +35,11 @@ export class LessonPage {
     stream: ({ params }) => this.learning.lesson(params),
   });
   protected readonly outline = rxResource({
-    params: () => this.lesson.value()?.course.id,
+    params: () => valueOf(this.lesson)?.course.id,
     stream: ({ params }) => this.learning.course(params),
   });
-  protected readonly completed = linkedSignal(() => this.lesson.value()?.progress.completed ?? false);
-  protected readonly formatDuration = formatDuration;
-
-  protected readonly moduleNumber = computed(() => {
-    const moduleId = this.lesson.value()?.module.id;
-    const index = this.outline.value()?.modules.findIndex((module) => module.id === moduleId) ?? -1;
-    return index + 1;
-  });
+  protected readonly completed = linkedSignal(() => valueOf(this.lesson)?.progress.completed ?? false);
+  protected readonly autoplay = signal(readStoredFlag(AUTOPLAY_KEY));
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.saveOnExit());
@@ -62,6 +51,13 @@ export class LessonPage {
 
   protected onEnded(): void {
     if (!this.completed()) this.setCompleted(true);
+    const next = valueOf(this.lesson)?.nextLessonId;
+    if (this.autoplay() && next) void this.router.navigate(['/aula', next]);
+  }
+
+  protected toggleAutoplay(value: boolean): void {
+    this.autoplay.set(value);
+    writeStoredFlag(AUTOPLAY_KEY, value);
   }
 
   protected setCompleted(value: boolean): void {
@@ -81,7 +77,7 @@ export class LessonPage {
 
   protected saveOnExit(): void {
     const position = this.player()?.currentTime() ?? 0;
-    const lesson = this.lesson.value();
+    const lesson = valueOf(this.lesson);
     if (lesson && position > 0) this.learning.saveProgressOnExit(lesson.id, position);
   }
 }

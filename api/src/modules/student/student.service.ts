@@ -22,7 +22,7 @@ export class StudentService {
     const course = await this.prisma.course.findFirst({
       where: { id: courseId, ...this.visibility(user) },
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
         modules: {
           orderBy: { position: 'asc' },
           include: { lessons: { orderBy: { position: 'asc' }, select: lessonOutlineSelect } },

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guards';
 import { Shell } from './layouts/shell';
+import { MovaLayout } from './layouts/mova-layout';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -24,14 +25,12 @@ export const routes: Routes = [
   {
     path: 'adm',
     component: Shell,
-    data: { area: 'admin' },
     canActivate: [authGuard, adminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },
   {
     path: '',
-    component: Shell,
-    data: { area: 'student' },
+    component: MovaLayout,
     canActivate: [authGuard],
     children: [
       {

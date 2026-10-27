@@ -1,0 +1,242 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 40;
+  background: var(--mova-black);
+  color: var(--mova-white);
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 41;
+  padding: 0.75rem 1rem;
+  background: var(--mova-white);
+  color: var(--mova-black);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-100%);
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: var(--mova-header-height);
+  padding: 0 1.5rem;
+}
+
+.brand {
+  color: var(--mova-white);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+
+  sup {
+    margin-left: 2px;
+    color: var(--mova-accent);
+    font-size: 0.6rem;
+  }
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  color: rgb(251 251 251 / 85%);
+  font-size: 0.95rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: var(--mova-min);
+    color: var(--mova-white);
+  }
+
+  &.is-active,
+  &--accent {
+    color: var(--mova-white);
+    font-weight: 700;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+.progress-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--mova-green);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.profile {
+  position: relative;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 3px solid var(--mova-green);
+  border-radius: 50%;
+  background: var(--mova-white-hover);
+  color: var(--mova-green);
+  font-size: 24px;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 260px;
+  padding: 0.25rem 0 0.5rem;
+  border-radius: 8px;
+  background: var(--mova-raised);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+
+  a,
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border: 0;
+    background: none;
+    color: var(--mova-white);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--mova-min);
+    }
+  }
+}
+
+.dropdown-user {
+  display: grid;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid #3d3d3d;
+
+  span {
+    color: var(--mova-white-active);
+    font-size: 0.875rem;
+  }
+}
+
+.level-bar {
+  display: flex;
+  align-items: center;
+  min-height: var(--mova-level-bar-height);
+  background: var(--mova-green);
+  color: var(--mova-black);
+}
+
+.level-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-width: 48px;
+  padding: 0 0.75rem;
+  font-size: 1.1rem;
+  box-shadow: 4px 0 12px rgb(0 0 0 / 15%);
+}
+
+.level-content {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 12rem;
+}
+
+.level-text,
+.level-percent {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.level-track {
+  flex: 1;
+  height: 12px;
+  overflow: hidden;
+  border: 2px solid #555;
+  border-radius: 999px;
+  background: rgb(251 251 251 / 90%);
+}
+
+.level-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px 0 0 999px;
+  background: var(--mova-accent);
+  transition: width 0.4s ease;
+
+  &.is-full {
+    border-radius: 999px;
+  }
+}
+
+:host(.is-compact) {
+  --mova-level-bar-height: 0px;
+}
+
+main {
+  padding-top: calc(var(--mova-header-height) + var(--mova-level-bar-height));
+  outline: none;
+}
+
+@media (max-width: 1100px) {
+  .level-content {
+    padding: 0 1.5rem;
+  }
+
+  .progress-chip {
+    display: none;
+  }
+}

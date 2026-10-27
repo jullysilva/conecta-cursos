@@ -1,0 +1,68 @@
+<header class="header">
+  <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
+  <nav class="navbar" aria-label="Principal">
+    <a class="brand" routerLink="/home" aria-label="Campus, página inicial">
+      Campus<sup aria-hidden="true">●</sup>
+    </a>
+
+    <ul class="nav">
+      <li><a class="nav-link" routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
+      @for (category of (categories.hasValue() ? categories.value() : undefined) ?? []; track category.id) {
+        <li><a class="nav-link" routerLink="/home" [fragment]="category.slug">{{ category.name }}</a></li>
+      }
+      <li><a class="nav-link nav-link--accent" routerLink="/trilhas" routerLinkActive="is-active" ariaCurrentWhenActive="page">Trilhas</a></li>
+    </ul>
+
+    <div class="actions">
+      <span class="progress-chip">
+        <i class="ri-arrow-up-double-line" aria-hidden="true"></i>
+        <span class="sr-only">Progresso geral:</span> {{ overallProgress() }}% completo
+      </span>
+      @if (auth.user(); as user) {
+        <div class="profile">
+          <button type="button" class="avatar" (click)="toggleMenu($event)" [attr.aria-expanded]="menuOpen()"
+            aria-haspopup="menu" aria-controls="profile-menu" aria-label="Menu do usuário">
+            <i class="ri-user-line" aria-hidden="true"></i>
+          </button>
+          @if (menuOpen()) {
+            <div class="dropdown" id="profile-menu" role="menu">
+              <div class="dropdown-user">
+                <strong>{{ user.name }}</strong>
+                <span>{{ user.email }}</span>
+              </div>
+              <a role="menuitem" routerLink="/perfil" (click)="menuOpen.set(false)">
+                <i class="ri-user-3-line" aria-hidden="true"></i> Meu perfil
+              </a>
+              @if (auth.isAdmin()) {
+                <a role="menuitem" routerLink="/adm" (click)="menuOpen.set(false)">
+                  <i class="ri-settings-4-line" aria-hidden="true"></i> Administração
+                </a>
+              }
+              <button type="button" role="menuitem" (click)="auth.logout()">
+                <i class="ri-logout-box-r-line" aria-hidden="true"></i> Sair
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </nav>
+
+  @if (!compact()) {
+  <div class="level-bar">
+    <span class="level-tag" aria-hidden="true"><i class="ri-trophy-line"></i></span>
+    <div class="level-content">
+      <span class="level-text">Seu progresso <strong>geral</strong></span>
+      <div class="level-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+        [attr.aria-valuenow]="overallProgress()" aria-label="Progresso geral nos cursos iniciados">
+        <span class="level-fill" [class.is-full]="overallProgress() === 100" [style.width.%]="overallProgress()"></span>
+      </div>
+      <span class="level-percent"><strong>{{ overallProgress() }}%</strong> completo</span>
+    </div>
+  </div>
+  }
+</header>
+
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>

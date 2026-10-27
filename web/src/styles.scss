@@ -1,3 +1,5 @@
+@use 'sass:meta';
+
 :root {
   --ink: #1c2b39;
   --ink-soft: #4a5a68;
@@ -12,6 +14,17 @@
   --amber-tint: #fbf0dc;
   --danger: #c2412d;
   --danger-tint: #fbe7e3;
+  --amber-ink: #8a5a12;
+
+  /* Solid fills behind white text, and the dark "emphasis" block (rail, lead metric). */
+  --fill-primary: var(--forest);
+  --fill-primary-hover: var(--forest-strong);
+  --fill-danger: var(--danger);
+  --emphasis: #1c2b39;
+  --on-emphasis: #ffffff;
+  --hover-tint: rgb(28 43 57 / 6%);
+  --modal-shadow: 0 24px 64px rgb(28 43 57 / 25%);
+  --modal-backdrop: rgb(28 43 57 / 45%);
 
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-body: 'Source Sans 3', system-ui, sans-serif;
@@ -21,6 +34,7 @@
   --radius-lg: 18px;
   --rail-width: 232px;
   --focus: 0 0 0 3px rgb(31 111 92 / 35%);
+  color-scheme: light;
 }
 
 *,
@@ -123,11 +137,11 @@ img {
 }
 
 .btn-primary {
-  background: var(--forest);
+  background: var(--fill-primary);
   color: #fff;
 
   &:hover:not(:disabled) {
-    background: var(--forest-strong);
+    background: var(--fill-primary-hover);
   }
 }
 
@@ -146,13 +160,13 @@ img {
   color: var(--ink-soft);
 
   &:hover:not(:disabled) {
-    background: rgb(28 43 57 / 6%);
+    background: var(--hover-tint);
     color: var(--ink);
   }
 }
 
 .btn-danger {
-  background: var(--danger);
+  background: var(--fill-danger);
   color: #fff;
 }
 
@@ -287,7 +301,7 @@ textarea.input {
 
   &.is-warning {
     background: var(--amber-tint);
-    color: #8a5a12;
+    color: var(--amber-ink);
   }
 }
 
@@ -296,10 +310,12 @@ dialog.modal {
   padding: 0;
   border: 0;
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 64px rgb(28 43 57 / 25%);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--modal-shadow);
 
   &::backdrop {
-    background: rgb(28 43 57 / 45%);
+    background: var(--modal-backdrop);
   }
 }
 
@@ -356,3 +372,6 @@ dialog.modal {
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
+@include meta.load-css('styles/theme-admin-dark');
+@include meta.load-css('styles/theme-mova');

@@ -1,0 +1,76 @@
+<section class="carousel" aria-roledescription="carrossel" [attr.aria-labelledby]="listId + '-title'" [attr.id]="anchorId()">
+  <h2 class="title" [id]="listId + '-title'">{{ title() }}</h2>
+
+  <div class="container">
+    @if (pageCount() > 1) {
+      <button type="button" class="arrow arrow--prev" [attr.aria-controls]="listId" aria-label="Página anterior"
+        [disabled]="page() === 0" (click)="go(page() - 1)">
+        <i class="ri-arrow-left-s-line" aria-hidden="true"></i>
+      </button>
+    }
+
+    <div class="viewport">
+      <ul class="track" [id]="listId" aria-live="polite" [style.--items-per-page]="itemsPerPage()" [style.transform]="'translateX(' + offset() + ')'">
+        @for (course of courses(); track course.id; let i = $index) {
+          <li class="slide" [attr.aria-hidden]="!isVisible(i)" [attr.inert]="isVisible(i) ? null : ''">
+            <div class="card" [class.is-active]="activeId() === course.id">
+              @if (showProgress()) {
+                <div class="progress">
+                  <span class="progress-label" aria-hidden="true">{{ course.progress ?? 0 }}%</span>
+                  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                    [attr.aria-valuenow]="course.progress ?? 0" [attr.aria-label]="'Progresso do curso ' + course.title">
+                    <div class="progress-fill" [style.width.%]="course.progress ?? 0"></div>
+                  </div>
+                </div>
+              }
+              <button type="button" class="trigger" (click)="toggle(course.id)"
+                [attr.aria-expanded]="activeId() === course.id" [attr.aria-controls]="'info-' + course.id"
+                [attr.aria-label]="course.title">
+                @if (course.thumbnailUrl) {
+                  <img class="image" [src]="course.thumbnailUrl" alt="" draggable="false" loading="lazy" />
+                } @else {
+                  <span class="image image--placeholder" aria-hidden="true">
+                    <i class="ri-image-line"></i>
+                    <span>Sem imagem</span>
+                  </span>
+                }
+              </button>
+
+              <div class="info" [id]="'info-' + course.id" [attr.inert]="activeId() === course.id ? null : ''">
+                <h3 class="info-title">{{ course.title }}</h3>
+                @if (course.description) {
+                  <p class="info-desc">{{ course.description }}</p>
+                }
+                <div class="info-stats">
+                  <span><i class="ri-play-circle-line" aria-hidden="true"></i> {{ course.lessonsCount }} {{ course.lessonsCount === 1 ? 'aula' : 'aulas' }}</span>
+                  @if (course.workloadHours) {
+                    <span><i class="ri-time-line" aria-hidden="true"></i> {{ course.workloadHours }}h</span>
+                  }
+                </div>
+                <a class="btn btn-primary info-cta" [routerLink]="course.link">
+                  {{ course.progress ? 'Continuar' : 'Iniciar' }}
+                </a>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    @if (pageCount() > 1) {
+      <button type="button" class="arrow arrow--next" [attr.aria-controls]="listId" aria-label="Próxima página"
+        [disabled]="page() >= pageCount() - 1" (click)="go(page() + 1)">
+        <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  @if (pageCount() > 1) {
+    <div class="bullets" role="group" aria-label="Selecionar página">
+      @for (p of pages(); track p) {
+        <button type="button" class="bullet" [class.is-active]="p === page()" [attr.aria-controls]="listId"
+          [attr.aria-current]="p === page() ? 'true' : null" [attr.aria-label]="'Ir para página ' + (p + 1)" (click)="go(p)"></button>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,33 @@
+/*
+ * Admin dark theme. Keeps the admin identity (forest accent, amber highlights,
+ * Bricolage + Source Sans) on deep slate surfaces taken from the rail's hue.
+ * Applied to <html> by the admin Shell so dialogs and toasts follow it too.
+ * Text tokens are tuned for at least 4.5:1 against --surface and --paper.
+ */
+html.theme-admin-dark {
+  --ink: #e7eef1;
+  --ink-soft: #b6c4cc;
+  --ink-faint: #94a5b0;
+  --paper: #10181d;
+  --surface: #18232a;
+  --line: #2b3a44;
+  --forest: #5cc4a5;
+  --forest-strong: #8ad9c0;
+  --forest-tint: rgb(92 196 165 / 16%);
+  --amber: #eeb055;
+  --amber-tint: rgb(238 176 85 / 16%);
+  --amber-ink: #f3c47e;
+  --danger: #f08470;
+  --danger-tint: rgb(240 132 112 / 16%);
+
+  --fill-primary: #1f7a63;
+  --fill-primary-hover: #238a70;
+  --fill-danger: #b8402c;
+  --emphasis: #22313b;
+  --on-emphasis: #e7eef1;
+  --hover-tint: rgb(255 255 255 / 7%);
+  --modal-shadow: 0 24px 64px rgb(0 0 0 / 55%);
+  --modal-backdrop: rgb(4 8 10 / 70%);
+  --focus: 0 0 0 3px rgb(92 196 165 / 50%);
+  color-scheme: dark;
+}

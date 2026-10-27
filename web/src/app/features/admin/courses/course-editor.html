@@ -1,0 +1,73 @@
+<div class="page">
+  <a routerLink="/adm/cursos" class="back"><i class="ri-arrow-left-line" aria-hidden="true"></i> Cursos</a>
+  <header class="page-head">
+    <div>
+      <h1>{{ isNew() ? 'Novo curso' : (course.value()?.title ?? 'Curso') }}</h1>
+      @if (isNew()) {
+        <p>Preencha os dados básicos. Módulos e aulas ficam disponíveis depois de salvar.</p>
+      }
+    </div>
+    @if (!isNew() && course.value(); as current) {
+      <a class="btn btn-secondary" [routerLink]="['/curso', current.id]">
+        <i class="ri-eye-line" aria-hidden="true"></i> Ver como aluno
+      </a>
+    }
+  </header>
+
+  @if (course.error()) {
+    <p class="muted" role="alert">Curso não encontrado.</p>
+  } @else {
+    <div class="layout">
+      <form class="panel details" [formGroup]="form" (ngSubmit)="save()" novalidate aria-label="Dados do curso">
+        <h2>Dados do curso</h2>
+        <div class="field">
+          <label for="title">Título</label>
+          <input id="title" class="input" formControlName="title" />
+          @if (form.controls.title.touched && form.controls.title.invalid) {
+            <span class="error">Informe um título com 3 a 160 caracteres.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="description">Descrição</label>
+          <textarea id="description" class="input" formControlName="description" rows="4"></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="category">Categoria</label>
+            <select id="category" class="input" formControlName="categoryId">
+              <option [ngValue]="null">Sem categoria</option>
+              @for (category of categories.value() ?? []; track category.id) {
+                <option [ngValue]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="workload">Carga horária (horas)</label>
+            <input id="workload" class="input" type="number" min="0" formControlName="workloadHours" />
+          </div>
+          <div class="field span-2">
+            <label for="thumbnail">Imagem de capa (URL)</label>
+            <input id="thumbnail" class="input" type="url" formControlName="thumbnailUrl" placeholder="https://" />
+            <span class="hint">Proporção 16:9. Sem imagem, a capa é gerada a partir do título.</span>
+            @if (form.controls.thumbnailUrl.touched && form.controls.thumbnailUrl.invalid) {
+              <span class="error">Use um endereço que comece com http:// ou https://.</span>
+            }
+          </div>
+        </div>
+        <div class="flags">
+          <label class="check"><input type="checkbox" formControlName="published" /> Publicado</label>
+          <label class="check"><input type="checkbox" formControlName="featured" /> Destaque na página inicial</label>
+        </div>
+        <button type="submit" class="btn btn-primary save" [disabled]="saving()">
+          {{ saving() ? 'Salvando…' : (isNew() ? 'Criar curso' : 'Salvar curso') }}
+        </button>
+      </form>
+
+      @if (!isNew()) {
+        @if (course.value(); as current) {
+          <cp-course-content [course]="current" (changed)="course.reload()" />
+        }
+      }
+    </div>
+  }
+</div>

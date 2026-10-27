@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { formatDuration, fromDateTimeLocal, initials, toDateTimeLocal } from './format';
 import { errorMessage } from './http-error';
+import { readStoredFlag, writeStoredFlag } from './storage';
 import { embedUrl, extractVideoId } from './video';
 
 describe('format utils', () => {
@@ -61,5 +62,28 @@ describe('errorMessage', () => {
   it('falls back to a generic or custom message', () => {
     expect(errorMessage(new Error('x'))).toMatch(/Não foi possível/);
     expect(errorMessage(httpError(500), 'Falhou')).toBe('Falhou');
+  });
+});
+
+describe('storage utils', () => {
+  afterEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  it('round-trips a flag and falls back when it was never saved', () => {
+    expect(readStoredFlag('cp.test')).toBe(false);
+    expect(readStoredFlag('cp.test', true)).toBe(true);
+    writeStoredFlag('cp.test', false);
+    expect(readStoredFlag('cp.test', true)).toBe(false);
+    writeStoredFlag('cp.test', true);
+    expect(readStoredFlag('cp.test')).toBe(true);
+  });
+
+  it('survives unavailable storage', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    expect(readStoredFlag('cp.test', true)).toBe(true);
+    expect(() => writeStoredFlag('cp.test', true)).not.toThrow();
   });
 });

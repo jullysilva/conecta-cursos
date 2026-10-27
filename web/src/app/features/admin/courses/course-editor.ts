@@ -7,6 +7,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import type { CoursePayload } from '../../../core/models/admin.models';
 import { errorMessage } from '../../../shared/utils/http-error';
 import { CourseContent } from './course-content';
+import { valueOf } from '../../../shared/utils/resource';
 
 export const NEW_ID = 'novo';
 const URL_PATTERN = /^https?:\/\/.+/i;
@@ -52,7 +53,7 @@ export class CourseEditor {
 
   constructor() {
     effect(() => {
-      const course = this.course.value();
+      const course = valueOf(this.course);
       if (!course) return;
       this.form.reset({
         title: course.title,

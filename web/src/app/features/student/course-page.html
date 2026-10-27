@@ -1,78 +1,122 @@
-@if (course.isLoading()) {
-  <p class="loading" role="status">Carregando curso…</p>
-} @else if (course.error()) {
-  <cp-empty-state icon="ri-error-warning-line" title="Curso não encontrado"
-    text="Ele pode ter sido removido ou ainda não foi publicado.">
-    <a routerLink="/home" class="btn btn-secondary">Voltar para o início</a>
-  </cp-empty-state>
-} @else if (course.value(); as course) {
-  <nav class="crumbs" aria-label="Você está em">
-    <a routerLink="/home">Início</a>
-    @if (course.category) {
-      <span aria-hidden="true">/</span> <span>{{ course.category.name }}</span>
-    }
-  </nav>
-
-  <header class="hero">
-    <div class="hero-copy">
-      <h1>{{ course.title }}</h1>
-      @if (course.description) {
-        <p class="description">{{ course.description }}</p>
-      }
-      <ul class="facts">
-        <li><i class="ri-stack-line" aria-hidden="true"></i> {{ course.modules.length }} módulos</li>
-        <li><i class="ri-play-circle-line" aria-hidden="true"></i> {{ course.progress.totalLessons }} aulas</li>
-        @if (course.workloadHours) {
-          <li><i class="ri-time-line" aria-hidden="true"></i> {{ course.workloadHours }}h de carga horária</li>
-        } @else if (totalDuration()) {
-          <li><i class="ri-time-line" aria-hidden="true"></i> {{ formatDuration(totalDuration()) }} de vídeo</li>
+@if (course.hasValue() && course.value(); as course) {
+  <cp-course-frame [course]="course">
+    <nav class="mova-breadcrumb" aria-label="Trilha de navegação">
+      <ol>
+        <li><a routerLink="/home">Início</a></li>
+        @if (course.category) {
+          <li><a routerLink="/home" [fragment]="course.category.slug">{{ course.category.name }}</a></li>
         }
-      </ul>
-      <cp-progress-rail size="lg" [percent]="course.progress.percent" label="Seu progresso no curso" />
-      @if (course.nextLessonId) {
-        <a class="btn btn-primary" [routerLink]="['/aula', course.nextLessonId]">
-          <i class="ri-play-fill" aria-hidden="true"></i> {{ ctaLabel() }}
-        </a>
-      }
-    </div>
-    <cp-course-cover [title]="course.title" [imageUrl]="course.thumbnailUrl" />
-  </header>
+        <li><span aria-current="page">{{ course.title }}</span></li>
+      </ol>
+    </nav>
 
-  <section class="outline" aria-labelledby="outline-title">
-    <h2 id="outline-title">Conteúdo do curso</h2>
-    @for (module of course.modules; track module.id; let m = $index) {
-      <div class="module panel">
-        <h3>
-          <button type="button" class="module-toggle" (click)="toggle(module.id)"
-            [attr.aria-expanded]="!collapsed().has(module.id)" [attr.aria-controls]="'module-' + module.id">
-            <span class="module-index">Módulo {{ m + 1 }}</span>
-            <span class="module-title">{{ module.title }}</span>
-            <i [class]="collapsed().has(module.id) ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line'" aria-hidden="true"></i>
-          </button>
-        </h3>
-        @if (!collapsed().has(module.id)) {
-          <ol class="lessons" [id]="'module-' + module.id">
-            @for (lesson of module.lessons; track lesson.id) {
-              <li>
-                <a [routerLink]="['/aula', lesson.id]" [class.is-done]="lesson.completed">
-                  <i [class]="lesson.completed ? 'ri-checkbox-circle-fill' : 'ri-play-circle-line'" aria-hidden="true"></i>
-                  <span class="lesson-title">{{ lesson.title }}</span>
-                  @if (lesson.completed) {
-                    <span class="sr-only">(concluída)</span>
-                  }
-                  @if (lesson.durationSec) {
-                    <span class="duration">{{ formatDuration(lesson.durationSec) }}</span>
-                  }
-                </a>
-              </li>
-            } @empty {
-              <li class="no-lessons">Nenhuma aula neste módulo ainda.</li>
-            }
-          </ol>
-        }
+    <section class="hero" [class.hero--no-cover]="!course.thumbnailUrl" aria-label="Resumo do curso"
+      [style.background-image]="course.thumbnailUrl ? 'url(' + course.thumbnailUrl + ')' : null">
+      <div class="hero-overlay">
+        <div class="badges">
+          <span class="badge"><i class="ri-play-circle-line" aria-hidden="true"></i> {{ course.progress.totalLessons }} aulas</span>
+          @if (course.workloadHours) {
+            <span class="badge"><i class="ri-time-line" aria-hidden="true"></i> {{ course.workloadHours }}h</span>
+          }
+        </div>
+        <h1 class="hero-title">{{ course.title }}</h1>
+        <div class="hero-progress">
+          <div class="track" role="progressbar" aria-label="Progresso do curso" aria-valuemin="0" aria-valuemax="100"
+            [attr.aria-valuenow]="course.progress.percent">
+            <div class="fill" [style.width.%]="course.progress.percent"></div>
+          </div>
+          <span class="hero-progress-label">{{ course.progress.percent }}%</span>
+        </div>
       </div>
-    } @empty {
-      <cp-empty-state icon="ri-stack-line" title="Este curso ainda não tem aulas" />
+    </section>
+
+    @if (course.nextLessonId) {
+      <section class="action" [class.action--highlight]="stage() === 'start'" aria-label="Ação do curso">
+        <span class="action-badge" aria-hidden="true"><i [class]="action().icon"></i></span>
+        <div class="action-text">
+          <h2 class="action-title">{{ action().title }}</h2>
+          <p class="action-subtitle">{{ action().subtitle }}</p>
+        </div>
+        <a class="btn btn-primary action-cta" [routerLink]="['/aula', course.nextLessonId]">{{ action().cta }}</a>
+      </section>
     }
-  </section>
+
+    @if (course.description) {
+      <section class="panel-text" aria-labelledby="presentation-title">
+        <h2 id="presentation-title">Apresentação</h2>
+        <p class="description">{{ course.description }}</p>
+      </section>
+    }
+
+    <section class="outline" aria-labelledby="outline-title">
+      <h2 class="outline-title" id="outline-title">Módulos e aulas</h2>
+      @if (course.modules.length) {
+        <ul class="module-grid">
+          @for (module of course.modules; track module.id; let m = $index) {
+            <li>
+              <button type="button" class="module-card" [class.is-active]="expandedModuleId() === module.id"
+                [attr.aria-expanded]="expandedModuleId() === module.id" aria-controls="outline-module-lessons"
+                (click)="toggleModule(module.id)">
+                <span class="module-thumb" aria-hidden="true">
+                  @if (course.thumbnailUrl) {
+                    <img [src]="course.thumbnailUrl" alt="" loading="lazy" />
+                  } @else {
+                    <i class="ri-stack-line"></i>
+                  }
+                </span>
+                <span class="module-overlay">
+                  <span class="module-title">{{ m + 1 }}. {{ module.title }}</span>
+                  <span class="module-meta">{{ completedIn(module.id) }} de {{ module.lessons.length }} aulas concluídas</span>
+                </span>
+                <i class="ri-arrow-down-s-line module-chevron" aria-hidden="true"></i>
+              </button>
+            </li>
+          }
+        </ul>
+
+        @if (expandedModule(); as module) {
+          <section class="expanded" id="outline-module-lessons" aria-label="Aulas do módulo">
+            <div class="expanded-head">
+              <h3 class="expanded-title">{{ module.title }}</h3>
+              <button type="button" class="expanded-close" aria-label="Fechar aulas" (click)="expandedModuleId.set(null)">
+                <i class="ri-close-line" aria-hidden="true"></i>
+              </button>
+            </div>
+            <ul class="lesson-grid">
+              @for (lesson of module.lessons; track lesson.id) {
+                <li class="lesson-card">
+                  <a class="lesson-link" [routerLink]="['/aula', lesson.id]">
+                    <span class="lesson-thumb" aria-hidden="true">
+                      <i class="ri-video-line lesson-icon"></i>
+                      @if (lesson.completed) {
+                        <span class="lesson-badge"><i class="ri-check-line"></i></span>
+                      }
+                    </span>
+                    <span class="lesson-body">
+                      <span class="lesson-title">{{ lesson.title }}</span>
+                      <span class="lesson-meta">
+                        Vídeo{{ lesson.durationSec ? ', ' + formatDuration(lesson.durationSec) : '' }}{{ lesson.completed ? ', concluída' : '' }}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              } @empty {
+                <li class="lesson-empty">Nenhuma aula neste módulo ainda.</li>
+              }
+            </ul>
+          </section>
+        }
+      } @else {
+        <p class="muted">Este curso ainda não tem aulas.</p>
+      }
+    </section>
+  </cp-course-frame>
+} @else if (course.error()) {
+  <div class="mova-state">
+    <h1>Curso não encontrado</h1>
+    <p>O curso que você tentou acessar não existe ou não está mais disponível.</p>
+    <a routerLink="/home" class="btn btn-primary">Voltar para o início</a>
+  </div>
+} @else {
+  <p class="mova-state" role="status">Carregando curso…</p>
 }

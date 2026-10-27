@@ -34,7 +34,7 @@ const PAGE_SIZE = 20;
           [value]="search()" (input)="onSearch($any($event.target).value)" />
       </div>
 
-      @if (courses.value(); as result) {
+      @if (courses.hasValue() && courses.value(); as result) {
         @if (result.items.length) {
           <div class="panel">
             <table class="table">

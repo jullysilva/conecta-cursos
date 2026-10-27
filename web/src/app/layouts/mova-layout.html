@@ -7,7 +7,7 @@
 
     <ul class="nav">
       <li><a class="nav-link" routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
-      @for (category of categories.value() ?? []; track category.id) {
+      @for (category of (categories.hasValue() ? categories.value() : undefined) ?? []; track category.id) {
         <li><a class="nav-link" routerLink="/home" [fragment]="category.slug">{{ category.name }}</a></li>
       }
       <li><a class="nav-link nav-link--accent" routerLink="/trilhas" routerLinkActive="is-active" ariaCurrentWhenActive="page">Trilhas</a></li>
@@ -48,6 +48,7 @@
     </div>
   </nav>
 
+  @if (!compact()) {
   <div class="level-bar">
     <span class="level-tag" aria-hidden="true"><i class="ri-trophy-line"></i></span>
     <div class="level-content">
@@ -59,6 +60,7 @@
       <span class="level-percent"><strong>{{ overallProgress() }}%</strong> completo</span>
     </div>
   </div>
+  }
 </header>
 
 <main id="main-content" tabindex="-1">

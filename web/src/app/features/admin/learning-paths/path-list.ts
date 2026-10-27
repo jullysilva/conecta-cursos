@@ -7,6 +7,7 @@ import type { AdminLearningPath } from '../../../core/models/admin.models';
 import { EmptyState } from '../../../shared/components/empty-state';
 import { errorMessage } from '../../../shared/utils/http-error';
 import { PathDialog, PathDialogResult } from './path-dialog';
+import { valueOf } from '../../../shared/utils/resource';
 
 @Component({
   selector: 'cp-path-list',
@@ -24,7 +25,7 @@ import { PathDialog, PathDialogResult } from './path-dialog';
         </button>
       </header>
 
-      @if (paths.value(); as list) {
+      @if (paths.hasValue() && paths.value(); as list) {
         @if (list.length) {
           <div class="panel">
             <table class="table">
@@ -54,7 +55,7 @@ import { PathDialog, PathDialogResult } from './path-dialog';
         }
       }
     </div>
-    <cp-path-dialog [courses]="courses.value() ?? []" (saved)="save($event)" />
+    <cp-path-dialog [courses]="(courses.hasValue() ? courses.value() : undefined) ?? []" (saved)="save($event)" />
   `,
   styles: `
     .link { padding: 0; border: 0; background: none; color: var(--forest); font: inherit; text-align: left; cursor: pointer; }
@@ -71,7 +72,7 @@ export class PathList {
   protected readonly paths = rxResource({ stream: () => this.api.learningPaths() });
   protected readonly courses = rxResource({ stream: () => this.api.courseOptions() });
   private readonly titleById = computed(
-    () => new Map((this.courses.value() ?? []).map((course) => [course.id, course.title])),
+    () => new Map((valueOf(this.courses) ?? []).map((course) => [course.id, course.title])),
   );
 
   protected courseTitles(path: AdminLearningPath): string {

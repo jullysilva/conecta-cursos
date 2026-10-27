@@ -24,7 +24,7 @@ import { errorMessage } from '../../../shared/utils/http-error';
         </a>
       </header>
 
-      @if (banners.value(); as list) {
+      @if (banners.hasValue() && banners.value(); as list) {
         @if (list.length) {
           <ul class="grid">
             @for (banner of list; track banner.id) {

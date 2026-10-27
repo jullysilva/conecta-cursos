@@ -36,7 +36,7 @@ const PAGE_SIZE = 20;
         </select>
       </div>
 
-      @if (users.value(); as result) {
+      @if (users.hasValue() && users.value(); as result) {
         @if (result.items.length) {
           <div class="panel">
             <table class="table">

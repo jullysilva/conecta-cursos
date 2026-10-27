@@ -1,0 +1,75 @@
+@if (auth.user(); as user) {
+  <section class="hero" aria-label="Seus dados">
+    <span class="avatar" aria-hidden="true"><i class="ri-user-line"></i></span>
+    <div class="info">
+      <h1 class="name">{{ user.name }}</h1>
+      <p class="email">{{ user.email }}</p>
+      @if (summary.hasValue() && summary.value(); as summary) {
+        <p class="badge">
+          <i class="ri-checkbox-circle-line" aria-hidden="true"></i>
+          {{ summary.completedLessons }} {{ summary.completedLessons === 1 ? 'aula concluída' : 'aulas concluídas' }},
+          {{ summary.completedCourses }} {{ summary.completedCourses === 1 ? 'curso concluído' : 'cursos concluídos' }}
+        </p>
+      }
+    </div>
+    <button type="button" class="logout" (click)="logout()">
+      <i class="ri-logout-box-r-line" aria-hidden="true"></i> Sair da conta
+    </button>
+  </section>
+}
+
+<section aria-labelledby="history-title">
+  <h2 class="mova-section-title" id="history-title">Histórico de cursos</h2>
+  @if (summary.hasValue() && summary.value(); as summary) {
+    @if (summary.courses.length) {
+      <ul class="courses">
+        @for (course of summary.courses; track course.id) {
+          <li class="card">
+            <span class="thumb" aria-hidden="true">
+              @if (course.thumbnailUrl) {
+                <img [src]="course.thumbnailUrl" alt="" loading="lazy" />
+              } @else {
+                <i class="ri-image-line"></i>
+              }
+            </span>
+            <div class="body">
+              <div class="meta-top">
+                <h3 class="title">{{ course.title }}</h3>
+                <span class="status" [class.status--completed]="isDone(course)" [class.status--in-progress]="!isDone(course)">
+                  {{ isDone(course) ? 'Concluído' : 'Em andamento' }}
+                </span>
+              </div>
+              <div class="progress">
+                <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                  [attr.aria-valuenow]="course.progress.percent" [attr.aria-label]="'Andamento do curso ' + course.title">
+                  <div class="fill" [style.width.%]="course.progress.percent"></div>
+                </div>
+                <span class="label">{{ course.progress.percent }}%</span>
+              </div>
+              <p class="meta">
+                {{ course.progress.completedLessons }} de {{ course.progress.totalLessons }} aulas, último acesso em {{ dateFormat.format(toDate(course.lastAccessedAt)) }}
+              </p>
+            </div>
+            <a class="btn btn-primary action" [attr.aria-label]="'Abrir o curso ' + course.title"
+              [routerLink]="!isDone(course) && course.lastLessonId ? ['/aula', course.lastLessonId] : ['/curso', course.id]">
+              {{ isDone(course) ? 'Rever' : 'Continuar' }}
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="empty">
+        <i class="ri-book-open-line" aria-hidden="true"></i>
+        <p>Você ainda não iniciou nenhum curso.</p>
+        <a routerLink="/home" class="btn btn-primary">Explorar cursos</a>
+      </div>
+    }
+  } @else if (summary.error()) {
+    <div class="empty">
+      <p>Não foi possível carregar seu histórico de cursos.</p>
+      <button type="button" class="btn btn-primary" (click)="summary.reload()">Tentar novamente</button>
+    </div>
+  } @else {
+    <p class="empty" role="status">Carregando histórico de cursos…</p>
+  }
+</section>

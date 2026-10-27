@@ -47,8 +47,8 @@ export class AuthController {
   @Throttle({ default: { limit: Math.ceil(env.authRateLimit / 2), ttl: 60_000 } })
   @Post('forgot-password')
   @HttpCode(202)
-  async forgotPassword(@Body() dto: ForgotPasswordDto) {
-    await this.auth.forgotPassword(dto.email);
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    this.auth.requestPasswordReset(dto.email);
     return { message: 'Se o e-mail existir, enviaremos as instruções.' };
   }
 

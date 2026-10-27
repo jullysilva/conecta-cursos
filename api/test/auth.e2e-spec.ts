@@ -88,6 +88,10 @@ describe('Auth (e2e)', () => {
       .post('/api/auth/forgot-password')
       .send({ email: 'desconhecido@test.local' })
       .expect(202);
+    await request(app.getHttpServer())
+      .post('/api/auth/forgot-password')
+      .send({ email: 'aluno@test.local' })
+      .expect(202, { message: 'Se o e-mail existir, enviaremos as instruções.' });
 
     const token = await app.get(AuthService).forgotPassword('aluno@test.local');
     expect(token).toBeTypeOf('string');

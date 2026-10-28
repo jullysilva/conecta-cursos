@@ -3,7 +3,8 @@
 LMS corporativo inspirado no Mova (engenharia reversa das rotas, da API e do CSS públicos).
 A área do aluno segue o design do Mova (tema escuro, header fixo com barra de progresso, banner em
 tela cheia e carrosséis de cards em pôster), com o nome e a logo do Conecta Cursos. O painel admin usa os
-verdes da logo, escuro por padrão, com alternância para o claro. Suporte a **PC e tablet** (sem layout mobile).
+verdes da logo, escuro por padrão, com alternância para o claro. Suporte a **celular (a partir de 360px), tablet e PC** na área do aluno e no login; o painel
+admin é para **tablet e PC**.
 
 | Pasta | Stack |
 |---|---|
@@ -43,7 +44,7 @@ O workflow `.github/workflows/ci.yml` roda em toda PR para a `main` e a cada pus
 |---|---|
 | API | oxlint, `tsc`, testes unitários com cobertura, E2E contra Postgres 17 de serviço e build |
 | Web | testes unitários com cobertura, build de produção e limite de 100 kB (brotli) no bundle inicial (`web/scripts/check-bundle-size.mjs`) |
-| Interface | Playwright em PC e tablet com axe; só roda quando a mudança toca `web/` ou o workflow. No CI usa o Google Chrome que já vem no runner. Em caso de falha, o relatório fica como artefato |
+| Interface | Playwright em PC, tablet e celular com axe; só roda quando a mudança toca `web/` ou o workflow. No CI usa o Google Chrome que já vem no runner. Em caso de falha, o relatório fica como artefato |
 
 ## Spec-driven development (spec-kit)
 

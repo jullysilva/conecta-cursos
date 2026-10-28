@@ -102,3 +102,18 @@
     }
   }
 }
+
+@media (max-width: 767.98px) {
+  .progress-row,
+  .skeleton {
+    padding: 0 1rem;
+  }
+
+  .skeleton-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    .skeleton-card:nth-child(n + 3) {
+      display: none;
+    }
+  }
+}

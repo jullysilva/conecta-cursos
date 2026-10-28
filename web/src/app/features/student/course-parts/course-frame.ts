@@ -1,4 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { CourseDetail } from '../../../core/models/models';
 import { formatDuration } from '../../../shared/utils/format';
@@ -16,7 +28,7 @@ const COLLAPSED_KEY = 'cp.course-sidebar-collapsed';
   imports: [RouterLink],
   templateUrl: './course-frame.html',
   styleUrl: './course-frame.scss',
-  host: { '[class.is-collapsed]': 'collapsed()' },
+  host: { '[class.is-collapsed]': 'collapsed()', '(document:keydown.escape)': 'closeDrawer()' },
 })
 export class CourseFrame {
   readonly course = input.required<CourseDetail>();
@@ -24,6 +36,11 @@ export class CourseFrame {
   readonly currentLessonId = input<string | null>(null);
 
   protected readonly collapsed = signal(readStoredFlag(COLLAPSED_KEY));
+  /** Mobile only: the outline opens as an overlay drawer, never persisted. */
+  protected readonly drawerOpen = signal(false);
+  private readonly drawerClose = viewChild<ElementRef<HTMLButtonElement>>('drawerClose');
+  private readonly drawerTrigger = viewChild.required<ElementRef<HTMLButtonElement>>('drawerTrigger');
+  private readonly injector = inject(Injector);
   protected readonly formatDuration = formatDuration;
 
   /** Lesson number across the whole course, as Mova shows ("Aula 4"). */
@@ -49,6 +66,18 @@ export class CourseFrame {
   protected toggleCollapsed(): void {
     this.collapsed.update((value) => !value);
     writeStoredFlag(COLLAPSED_KEY, this.collapsed());
+  }
+
+  protected openDrawer(): void {
+    this.drawerOpen.set(true);
+    afterNextRender(() => this.drawerClose()?.nativeElement.focus(), { injector: this.injector });
+  }
+
+  /** Closes the drawer; focus returns to its trigger unless a lesson link is navigating away. */
+  protected closeDrawer(restoreFocus = true): void {
+    if (!this.drawerOpen()) return;
+    this.drawerOpen.set(false);
+    if (restoreFocus) this.drawerTrigger().nativeElement.focus();
   }
 
   protected toggleModule(id: string): void {

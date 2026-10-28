@@ -9,7 +9,7 @@
       </button>
     }
 
-    <div class="viewport">
+    <div class="viewport" (touchstart)="swipe.start($event)" (touchend)="onSwipe(swipe.end($event))">
       <ul class="track" [id]="listId" aria-live="polite" [style.--items-per-page]="itemsPerPage()" [style.transform]="'translateX(' + offset() + ')'">
         @for (course of courses(); track course.id; let i = $index) {
           <li class="slide" [attr.aria-hidden]="!isVisible(i)" [attr.inert]="isVisible(i) ? null : ''">

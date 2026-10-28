@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { formatDuration, fromDateTimeLocal, initials, toDateTimeLocal } from './format';
 import { errorMessage } from './http-error';
 import { readStoredFlag, writeStoredFlag } from './storage';
+import { SwipeTracker } from './swipe';
 import { embedUrl, extractVideoId } from './video';
 
 describe('format utils', () => {
@@ -85,5 +86,24 @@ describe('storage utils', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
     expect(readStoredFlag('cp.test', true)).toBe(true);
     expect(() => writeStoredFlag('cp.test', true)).not.toThrow();
+  });
+});
+
+describe('SwipeTracker', () => {
+  const touch = (x: number, y: number) => ({ changedTouches: [{ clientX: x, clientY: y }] }) as unknown as TouchEvent;
+  const gesture = (from: [number, number], to: [number, number]) => {
+    const tracker = new SwipeTracker();
+    tracker.start(touch(...from));
+    return tracker.end(touch(...to));
+  };
+
+  it('pages forward on a left swipe and back on a right swipe', () => {
+    expect(gesture([200, 100], [120, 110])).toBe(1);
+    expect(gesture([120, 100], [200, 90])).toBe(-1);
+  });
+
+  it('ignores short or mostly vertical gestures', () => {
+    expect(gesture([200, 100], [180, 100])).toBe(0);
+    expect(gesture([200, 100], [140, 220])).toBe(0);
   });
 });

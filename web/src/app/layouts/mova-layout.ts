@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -21,7 +21,7 @@ import { BrandMark } from '../shared/components/brand-mark';
   host: {
     class: 'theme-mova',
     '[class.is-compact]': 'compact()',
-    '(document:keydown.escape)': 'menuOpen.set(false)',
+    '(document:keydown.escape)': 'closeMenus()',
     '(document:click)': 'closeMenuOnOutsideClick($event)',
   },
 })
@@ -33,6 +33,8 @@ export class MovaLayout {
   private readonly router = inject(Router);
 
   protected readonly menuOpen = signal(false);
+  /** Mobile navigation drawer (the category links collapse behind a menu button). */
+  protected readonly navOpen = signal(false);
   private readonly url = toSignal(
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
@@ -53,12 +55,34 @@ export class MovaLayout {
     return total ? Math.round((done / total) * 100) : 0;
   });
 
+  constructor() {
+    // Any navigation (including a category anchor) closes the mobile menu.
+    effect(() => {
+      this.url();
+      untracked(() => this.navOpen.set(false));
+    });
+  }
+
   protected toggleMenu(event: Event): void {
     event.stopPropagation();
+    this.navOpen.set(false);
     this.menuOpen.update((open) => !open);
   }
 
+  protected toggleNav(event: Event): void {
+    event.stopPropagation();
+    this.menuOpen.set(false);
+    this.navOpen.update((open) => !open);
+  }
+
+  protected closeMenus(): void {
+    this.menuOpen.set(false);
+    this.navOpen.set(false);
+  }
+
   protected closeMenuOnOutsideClick(event: Event): void {
-    if (!(event.target as HTMLElement).closest('.profile')) this.menuOpen.set(false);
+    const target = event.target as HTMLElement;
+    if (!target.closest('.profile')) this.menuOpen.set(false);
+    if (!target.closest('.nav, .menu-toggle')) this.navOpen.set(false);
   }
 }

@@ -5,7 +5,12 @@
       <cp-brand-mark [size]="40" />
     </a>
 
-    <ul class="nav">
+    <button type="button" class="menu-toggle" (click)="toggleNav($event)" [attr.aria-expanded]="navOpen()"
+      aria-controls="main-nav" [attr.aria-label]="navOpen() ? 'Fechar menu' : 'Abrir menu'">
+      <i [class]="navOpen() ? 'ri-close-line' : 'ri-menu-line'" aria-hidden="true"></i>
+    </button>
+
+    <ul class="nav" id="main-nav" [class.is-open]="navOpen()">
       <li><a class="nav-link" routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
       @for (category of (categories.hasValue() ? categories.value() : undefined) ?? []; track category.id) {
         <li><a class="nav-link" routerLink="/home" [fragment]="category.slug">{{ category.name }}</a></li>

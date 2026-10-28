@@ -327,3 +327,30 @@
     outline-offset: 2px;
   }
 }
+
+/* Mobile: narrow gutters, swipe paging (arrows hidden) and larger bullet touch targets. */
+@media (max-width: 767.98px) {
+  :host {
+    --gutter: 1rem;
+  }
+
+  :host(.is-compact) {
+    --gutter: 0rem;
+  }
+
+  .title {
+    margin-bottom: 1.25rem;
+    font-size: 1.375rem;
+  }
+
+  .arrow {
+    display: none;
+  }
+
+  .bullet,
+  .bullet.is-active {
+    box-sizing: content-box;
+    padding: 7px;
+    background-clip: content-box;
+  }
+}

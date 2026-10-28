@@ -32,6 +32,15 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .form-side { display: grid; place-items: center; padding: 3rem 2rem; }
     .form-box { width: min(400px, 100%); display: grid; gap: 1.5rem; }
     .lead { margin-top: -0.75rem; color: var(--ink-soft); }
+
+    /* Mobile: one column, the statement shrinks to a logo band above the form. */
+    @media (max-width: 767.98px) {
+      :host { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+      .statement { align-items: center; padding: 1.5rem 1rem; }
+      .lockup { width: 112px; }
+      .quote, .rail { display: none; }
+      .form-side { place-items: start center; padding: 2rem 1rem 3rem; }
+    }
   `,
 })
 export class AuthFrame {

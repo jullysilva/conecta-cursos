@@ -79,7 +79,7 @@ test.describe('Jornada do aluno', () => {
     await expectAccessible(page);
   });
 
-  test('profile is accessible', async ({ page }) => {
+  test('profile is accessible @mobile', async ({ page }) => {
     await page.goto('/perfil');
     await expect(page.getByRole('heading', { name: 'Histórico de cursos' })).toBeVisible();
     await expectAccessible(page);

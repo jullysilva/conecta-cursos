@@ -9,6 +9,8 @@
 
   display: grid;
   grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  /* The admin panel supports tablet and PC only; the student area and login go down to 360px. */
+  min-width: 768px;
   min-height: 100vh;
 }
 

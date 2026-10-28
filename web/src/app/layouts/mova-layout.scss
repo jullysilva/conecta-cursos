@@ -233,3 +233,96 @@ main {
     display: none;
   }
 }
+
+.menu-toggle {
+  display: none;
+}
+
+/* Mobile: categories move into a drawer under the header; the level bar keeps only the track. */
+@media (max-width: 767.98px) {
+  :host {
+    --mova-header-height: 60px;
+    --mova-level-bar-height: 36px;
+  }
+
+  .navbar {
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .menu-toggle {
+    display: grid;
+    place-items: center;
+    order: -1;
+    width: 40px;
+    height: 40px;
+    margin-left: -0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--mova-white);
+    font-size: 1.5rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--mova-min);
+    }
+  }
+
+  .brand {
+    --brand-name-display: none;
+  }
+
+  .nav {
+    position: fixed;
+    inset: var(--mova-header-height) 0 auto;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100dvh - var(--mova-header-height));
+    padding: 0.5rem 0 1rem;
+    overflow-y: auto;
+    background: var(--mova-black);
+    box-shadow: 0 12px 24px rgb(0 0 0 / 45%);
+
+    &.is-open {
+      display: flex;
+    }
+  }
+
+  .nav-link {
+    padding: 0.875rem 1.25rem;
+    border-radius: 0;
+    font-size: 1rem;
+  }
+
+  .dropdown {
+    position: fixed;
+    top: var(--mova-header-height);
+    right: 0.5rem;
+    left: 0.5rem;
+    min-width: 0;
+  }
+
+  .level-tag,
+  .level-text {
+    display: none;
+  }
+
+  .level-content {
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .level-percent {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 767.98px) {
+  .brand {
+    --brand-name-display: inline;
+  }
+}

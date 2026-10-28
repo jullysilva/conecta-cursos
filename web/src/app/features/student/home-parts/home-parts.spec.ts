@@ -125,3 +125,44 @@ describe('MovaBanner', () => {
     expect(el.querySelectorAll('.slide')[1].getAttribute('aria-hidden')).toBe('false');
   });
 });
+
+describe('Touch paging', () => {
+  const swipeLeft = (target: Element) => {
+    const event = (type: string, x: number) =>
+      Object.assign(new Event(type), { changedTouches: [{ clientX: x, clientY: 100 }] });
+    target.dispatchEvent(event('touchstart', 300));
+    target.dispatchEvent(event('touchend', 200));
+  };
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('shows two posters per page on phones and pages the carousel by swipe', async () => {
+    vi.stubGlobal('innerWidth', 375);
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(CarouselHost);
+    fixture.componentInstance.config = { tablet: 3, desktop: 4 };
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const visible = () => Array.from(el.querySelectorAll('.slide')).filter((slide) => slide.getAttribute('aria-hidden') === 'false');
+    expect(visible()).toHaveLength(2);
+    expect(el.querySelectorAll('.bullet')).toHaveLength(3);
+
+    swipeLeft(el.querySelector('.viewport')!);
+    await fixture.whenStable();
+    expect(el.querySelector('.bullet.is-active')?.getAttribute('aria-label')).toBe('Ir para página 2');
+  });
+
+  it('moves the banner to the next slide on swipe', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(MovaBanner);
+    fixture.componentRef.setInput('slides', [
+      { id: 'b1', title: 'Um', imageUrl: 'https://img/1.jpg', linkUrl: null },
+      { id: 'b2', title: 'Dois', imageUrl: 'https://img/2.jpg', linkUrl: null },
+    ] as Banner[]);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    swipeLeft(el.querySelector('.viewport')!);
+    await fixture.whenStable();
+    expect(el.querySelector('.bullet.is-active')?.getAttribute('aria-label')).toBe('Ir para banner 2');
+  });
+});

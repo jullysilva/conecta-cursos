@@ -59,4 +59,29 @@ describe('MovaLayout', () => {
     await admin.fixture.whenStable();
     expect(admin.el.querySelector('[role=menu]')).toBeNull();
   });
+
+  it('toggles the mobile menu, closing the profile menu and on Escape or outside clicks', async () => {
+    const { el, fixture } = await render();
+    const toggle = el.querySelector<HTMLButtonElement>('.menu-toggle')!;
+    expect(toggle.getAttribute('aria-label')).toBe('Abrir menu');
+
+    el.querySelector<HTMLButtonElement>('.avatar')!.click();
+    await fixture.whenStable();
+    toggle.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.getAttribute('aria-label')).toBe('Fechar menu');
+    expect(el.querySelector('#main-nav')?.classList).toContain('is-open');
+    expect(el.querySelector('[role=menu]')).toBeNull();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    toggle.click();
+    await fixture.whenStable();
+    document.body.click();
+    await fixture.whenStable();
+    expect(el.querySelector('#main-nav')?.classList).not.toContain('is-open');
+  });
 });

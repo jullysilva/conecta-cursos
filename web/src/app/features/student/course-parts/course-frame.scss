@@ -291,3 +291,82 @@
     padding: 1.25rem 1.5rem 2.5rem;
   }
 }
+
+.drawer-trigger,
+.mobile-only,
+.backdrop {
+  display: none;
+}
+
+/* Mobile: the outline becomes an overlay drawer opened from a bar above the content. */
+@media (max-width: 767.98px) {
+  :host,
+  :host(.is-collapsed) {
+    padding-left: 0;
+  }
+
+  .sidebar {
+    z-index: 45;
+    top: 0;
+    width: min(320px, 86vw);
+    height: 100dvh;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s;
+
+    &.is-drawer-open {
+      transform: none;
+      visibility: visible;
+      /* Visible at once on open so focus can move into the drawer; hiding waits for the slide-out. */
+      transition: transform 0.25s ease, visibility 0s;
+    }
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: grid;
+  }
+
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 44;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 60%);
+  }
+
+  .drawer-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    background: var(--mova-min);
+    color: var(--mova-white);
+    font: 600 0.9375rem var(--font-body);
+    cursor: pointer;
+
+    i {
+      color: var(--mova-accent);
+      font-size: 1.25rem;
+    }
+  }
+
+  .drawer-trigger-progress {
+    margin-left: auto;
+    color: var(--mova-white-active);
+    font-weight: 700;
+  }
+
+  .main {
+    padding: 1rem 1rem 2.5rem;
+  }
+}

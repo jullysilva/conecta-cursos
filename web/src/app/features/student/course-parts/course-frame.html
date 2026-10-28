@@ -1,5 +1,8 @@
-<aside class="sidebar" id="course-sidebar" aria-label="Conteúdo do curso">
-  @if (collapsed()) {
+@if (drawerOpen()) {
+  <button type="button" class="backdrop" tabindex="-1" aria-hidden="true" (click)="closeDrawer()"></button>
+}
+<aside class="sidebar" id="course-sidebar" aria-label="Conteúdo do curso" [class.is-drawer-open]="drawerOpen()">
+  @if (collapsed() && !drawerOpen()) {
     <button type="button" class="toggle" aria-controls="course-sidebar" aria-expanded="false" aria-label="Expandir menu"
       (click)="toggleCollapsed()">
       <i class="ri-menu-line" aria-hidden="true"></i>
@@ -10,9 +13,12 @@
         <a class="back" routerLink="/home"><i class="ri-arrow-left-s-line" aria-hidden="true"></i> Voltar para o início</a>
         <p class="title">{{ course().title }}</p>
       </div>
-      <button type="button" class="toggle" aria-controls="course-sidebar" aria-expanded="true" aria-label="Recolher menu"
+      <button type="button" class="toggle desktop-only" aria-controls="course-sidebar" aria-expanded="true" aria-label="Recolher menu"
         (click)="toggleCollapsed()">
         <i class="ri-menu-line" aria-hidden="true"></i>
+      </button>
+      <button #drawerClose type="button" class="toggle mobile-only" aria-label="Fechar conteúdo do curso" (click)="closeDrawer()">
+        <i class="ri-close-line" aria-hidden="true"></i>
       </button>
     </div>
     <div class="progress">
@@ -35,7 +41,7 @@
             <ul class="lessons" [id]="'side-module-' + module.id">
               @for (lesson of module.lessons; track lesson.id) {
                 <li class="lesson" [class.is-completed]="lesson.completed" [class.is-selected]="lesson.id === currentLessonId()">
-                  <a class="lesson-link" [routerLink]="['/aula', lesson.id]"
+                  <a class="lesson-link" [routerLink]="['/aula', lesson.id]" (click)="closeDrawer(false)"
                     [attr.aria-current]="lesson.id === currentLessonId() ? 'page' : null">
                     <i class="ri-check-line check" aria-hidden="true"></i>
                     <i class="ri-play-circle-line icon" aria-hidden="true"></i>
@@ -61,5 +67,11 @@
 </aside>
 
 <div class="main">
+  <button #drawerTrigger type="button" class="drawer-trigger" aria-controls="course-sidebar" [attr.aria-expanded]="drawerOpen()"
+    (click)="openDrawer()">
+    <i class="ri-list-check-2" aria-hidden="true"></i>
+    <span>Conteúdo do curso</span>
+    <span class="drawer-trigger-progress">{{ course().progress.percent }}%</span>
+  </button>
   <ng-content />
 </div>

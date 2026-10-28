@@ -119,3 +119,21 @@ img {
     transform: scale(1.15);
   }
 }
+
+/* Mobile: a taller crop so the artwork stays legible; swipe replaces the large arrows. */
+@media (max-width: 767.98px) {
+  .viewport {
+    aspect-ratio: 16 / 9;
+  }
+
+  .arrow {
+    display: none;
+  }
+
+  .bullet,
+  .bullet.is-active {
+    box-sizing: content-box;
+    padding: 7px;
+    background-clip: content-box;
+  }
+}

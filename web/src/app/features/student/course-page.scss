@@ -403,3 +403,14 @@
 .muted {
   color: var(--mova-white-hover);
 }
+
+/* Mobile: the action card stacks its text above a full-width button. */
+@media (max-width: 767.98px) {
+  .action {
+    flex-wrap: wrap;
+  }
+
+  .action-cta {
+    width: 100%;
+  }
+}

@@ -1,6 +1,7 @@
 <!--
 Sync Impact Report
-- Version: 1.0.0 → 1.0.1 (PATCH: o limite de bundle é medido em brotli, não gzip; checagem no CI)
+- Version: 1.0.1 → 1.1.0 (MINOR: princípio VI passa a exigir celular na área do aluno e no login; admin segue tablet/PC)
+- Anterior: 1.0.0 → 1.0.1 (PATCH: o limite de bundle é medido em brotli, não gzip; checagem no CI)
 - Anterior: template → 1.0.0 (primeira ratificação)
 - Princípios adicionados: I–VII (todos novos)
 - Seções adicionadas: Stack e convenções técnicas; Fluxo de trabalho e entrega; Governança
@@ -56,9 +57,14 @@ Lógica repetida em dois ou mais lugares vira utilitário compartilhado, com tes
   de transferência estimada (brotli, o valor que o `ng build` mostra; hoje está em ~91 kB). O CI
   confere isso com `web/scripts/check-bundle-size.mjs`.
 
-### VI. Somente tablet e PC
-O layout é suportado a partir de 768px de largura (tablet e PC). Layout mobile está fora do
-escopo e NÃO deve ser planejado nem testado.
+### VI. Telas suportadas por área
+- **Área do aluno e telas de acesso** (login, esqueci/redefinir senha): celular a partir de 360px,
+  tablet e PC. Toda mudança nessas telas DEVE passar pelo projeto `mobile` do Playwright (testes
+  com a tag `@mobile`), sem rolagem lateral e com a checagem de acessibilidade.
+- **Painel administrativo**: somente tablet e PC (a partir de 768px). Layout mobile do admin está
+  fora do escopo.
+
+O breakpoint de celular é `max-width: 767.98px`.
 
 ### VII. Simplicidade
 Comece pelo mínimo que atende a spec. Novas dependências, camadas ou abstrações precisam de
@@ -105,4 +111,4 @@ em "Complexity Tracking". Alterações nesta constituição seguem versionamento
 remove ou redefine um princípio, MINOR adiciona, PATCH esclarece) e são feitas por
 `/speckit-constitution`, em PR própria.
 
-**Version**: 1.0.1 | **Ratified**: 2026-10-27 | **Last Amended**: 2026-10-27
+**Version**: 1.1.0 | **Ratified**: 2026-10-27 | **Last Amended**: 2026-10-27

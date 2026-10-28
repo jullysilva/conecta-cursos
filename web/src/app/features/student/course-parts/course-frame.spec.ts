@@ -56,3 +56,48 @@ describe('CourseFrame', () => {
     expect(el.querySelector('.nav')).not.toBeNull();
   });
 });
+
+describe('CourseFrame mobile drawer', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('opens the outline as a drawer and closes it with Escape or a lesson link', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: '**', children: [] }])] });
+    const fixture = TestBed.createComponent(CourseFrame);
+    fixture.componentRef.setInput('course', course);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const trigger = el.querySelector<HTMLButtonElement>('.drawer-trigger')!;
+    expect(trigger.textContent).toContain('33%');
+
+    trigger.click();
+    await fixture.whenStable();
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(el.querySelector('.sidebar')?.classList).toContain('is-drawer-open');
+    // Focus moving into the drawer and back to the trigger is asserted in e2e/mobile.spec.ts (real browser).
+    expect(el.querySelector('[aria-label="Fechar conteúdo do curso"]')).not.toBeNull();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await fixture.whenStable();
+    expect(el.querySelector('.sidebar')?.classList).not.toContain('is-drawer-open');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    trigger.click();
+    await fixture.whenStable();
+    el.querySelector<HTMLAnchorElement>('.lesson-link')!.click();
+    await fixture.whenStable();
+    expect(el.querySelector('.backdrop')).toBeNull();
+  });
+
+  it('shows the full outline in the drawer even when the desktop sidebar is collapsed', async () => {
+    localStorage.setItem('cp.course-sidebar-collapsed', '1');
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(CourseFrame);
+    fixture.componentRef.setInput('course', course);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.nav')).toBeNull();
+    el.querySelector<HTMLButtonElement>('.drawer-trigger')!.click();
+    await fixture.whenStable();
+    expect(el.querySelector('.nav')).not.toBeNull();
+  });
+});

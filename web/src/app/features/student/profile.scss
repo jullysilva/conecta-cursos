@@ -229,3 +229,53 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Mobile: the hero stacks and each history card puts its action on a full-width row. */
+@media (max-width: 767.98px) {
+  .hero {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .email {
+    overflow-wrap: anywhere;
+  }
+
+  .logout {
+    justify-content: center;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .card {
+    flex-wrap: wrap;
+  }
+
+  .meta-top {
+    flex-direction: column-reverse;
+    gap: 0.375rem;
+  }
+
+  .thumb {
+    width: 72px;
+  }
+
+  .body {
+    flex: 1;
+  }
+
+  .action {
+    width: 100%;
+  }
+}

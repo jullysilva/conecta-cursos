@@ -19,8 +19,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } }, grepInvert: /@mobile-only/ },
     { name: 'tablet', use: { ...devices['Desktop Chrome'], viewport: { width: 1024, height: 768 } }, grep: /@tablet/ },
+    // Student area and login only (@mobile also runs on desktop, @mobile-only does not); the admin is tablet and PC.
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, grep: /@mobile/ },
   ],
   webServer: [
     {

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SwipeTracker } from '../../../shared/utils/swipe';
 
 export interface CarouselCourse {
   id: string;
@@ -18,8 +19,13 @@ export interface ItemsPerPage {
   desktop: number;
 }
 
+/** Below this width every row shows two posters per page and pages by swipe. */
+const MOBILE_MAX_WIDTH = 768;
+const MOBILE_ITEMS_PER_PAGE = 2;
+
 /** Default density for full-width rows, by viewport width. */
 function defaultItemsPerPage(width: number): number {
+  if (width < MOBILE_MAX_WIDTH) return MOBILE_ITEMS_PER_PAGE;
   if (width >= 1400) return 6;
   if (width >= 1200) return 5;
   if (width >= 992) return 4;
@@ -57,7 +63,7 @@ export class CourseCarousel {
 
   protected readonly itemsPerPage = computed(() => {
     const config = this.itemsPerPageConfig();
-    if (!config) return defaultItemsPerPage(this.width());
+    if (!config || this.width() < MOBILE_MAX_WIDTH) return defaultItemsPerPage(this.width());
     return this.width() <= 992 ? config.tablet : config.desktop;
   });
   protected readonly pageCount = computed(() =>
@@ -86,6 +92,12 @@ export class CourseCarousel {
   protected go(page: number): void {
     this.activeId.set(null);
     this.page.set(Math.min(Math.max(page, 0), this.pageCount() - 1));
+  }
+
+  protected readonly swipe = new SwipeTracker();
+
+  protected onSwipe(step: number): void {
+    if (step) this.go(this.page() + step);
   }
 
   protected toggle(id: string): void {

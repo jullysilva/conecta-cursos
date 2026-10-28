@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Banner } from '../../../core/models/models';
+import { SwipeTracker } from '../../../shared/utils/swipe';
 
 const AUTOPLAY_MS = 5000;
 
@@ -13,7 +14,7 @@ const AUTOPLAY_MS = 5000;
     <section class="banner" aria-roledescription="carrossel" aria-label="Destaques"
       (mouseenter)="paused.set(true)" (mouseleave)="paused.set(false)"
       (focusin)="paused.set(true)" (focusout)="paused.set(false)">
-      <div class="viewport">
+      <div class="viewport" (touchstart)="swipe.start($event)" (touchend)="onSwipe(swipe.end($event))">
         <div class="track" id="banner-slides" aria-live="polite" [style.transform]="'translateX(' + -index() * 100 + '%)'">
           @for (banner of slides(); track banner.id; let i = $index) {
             <div class="slide" role="group" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' de ' + slides().length"
@@ -60,6 +61,12 @@ export class MovaBanner {
       if (!this.paused() && this.count() > 1) this.go(this.index() + 1);
     }, AUTOPLAY_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
+  }
+
+  protected readonly swipe = new SwipeTracker();
+
+  protected onSwipe(step: number): void {
+    if (step) this.go(this.index() + step);
   }
 
   protected go(target: number): void {

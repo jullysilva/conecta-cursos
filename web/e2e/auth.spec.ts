@@ -1,7 +1,7 @@
 import { ADMIN, expect, expectAccessible, login, STUDENT, test } from './fixtures';
 
 test.describe('Autenticação', () => {
-  test('login page is accessible and validates input', async ({ page }) => {
+  test('login page is accessible and validates input @mobile', async ({ page }) => {
     await page.goto('/login');
     await expectAccessible(page);
     await page.getByRole('button', { name: 'Entrar' }).click();

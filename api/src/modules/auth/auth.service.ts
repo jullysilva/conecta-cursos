@@ -6,6 +6,7 @@ import { MailService } from '../../infra/mail/mail.service.js';
 import { env } from '../../config/env.js';
 import { generateToken, hashToken } from '../../common/utils/token.js';
 import { escapeHtml } from '../../common/utils/escape-html.js';
+import { runInBackground } from '../../common/utils/run-in-background.js';
 import type { User } from '../../generated/prisma/client.js';
 
 const RESET_TTL_MS = 60 * 60 * 1000;
@@ -84,8 +85,10 @@ export class AuthService {
    * or not the e-mail exists (no account enumeration) and never waits on the SMTP server.
    */
   requestPasswordReset(email: string): void {
-    this.forgotPassword(email).catch((error: unknown) =>
-      this.logger.error('Failed to process password reset request', error as Error),
+    runInBackground(
+      this.forgotPassword(email).catch((error: unknown) =>
+        this.logger.error('Failed to process password reset request', error as Error),
+      ),
     );
   }
 

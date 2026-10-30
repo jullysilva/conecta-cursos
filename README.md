@@ -45,6 +45,28 @@ O workflow `.github/workflows/ci.yml` roda em toda PR para a `main` e a cada pus
 | API | oxlint, `tsc`, testes unitários com cobertura, E2E contra Postgres 17 de serviço e build |
 | Web | testes unitários com cobertura, build de produção e limite de 100 kB (brotli) no bundle inicial (`web/scripts/check-bundle-size.mjs`) |
 | Interface | Playwright em PC, tablet e celular com axe; só roda quando a mudança toca `web/` ou o workflow. No CI usa o Google Chrome que já vem no runner. Em caso de falha, o relatório fica como artefato |
+| Deploy | Só na `main`, depois dos outros jobs: `prisma migrate deploy` no banco de produção, `scripts/build-vercel-output.mjs` e `vercel deploy --prebuilt --prod` |
+
+## Deploy (Vercel)
+
+Site e API ficam no mesmo projeto Vercel e no mesmo domínio: o Angular é servido como arquivos estáticos e `/api/*` vai para uma Vercel Function (`api/src/vercel.ts`) com a API NestJS empacotada pelo esbuild (região `gru1`, São Paulo). O banco é um Postgres Neon instalado pelo Marketplace do Vercel.
+
+Configuração única:
+
+1. **Projeto:** no Vercel, crie um projeto vazio (sem conectar o Git) e anote o *Project ID* e o *Team/Org ID* (Settings → General).
+2. **Banco:** em Storage, instale o Neon na região São Paulo e conecte ao projeto; ele cria `DATABASE_URL` e `DATABASE_URL_UNPOOLED`.
+3. **Variáveis do projeto** (Settings → Environment Variables, Production): `JWT_ACCESS_SECRET` (aleatório, ex.: `openssl rand -base64 48`) e `WEB_URL` (URL de produção, ex.: `https://conecta-cursos.vercel.app`).
+4. **Token:** em Account Settings → Tokens, crie um token para o GitHub Actions.
+5. **Secrets do GitHub** (Settings → Secrets and variables → Actions): `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` e `PRODUCTION_DATABASE_URL` (o valor de `DATABASE_URL_UNPOOLED`, usado nas migrations).
+6. **Primeiro admin**, depois do primeiro deploy (que cria as tabelas). O seed tem senhas públicas e não roda em produção:
+
+```bash
+cd api
+ADMIN_NAME="Seu nome" ADMIN_EMAIL=voce@exemplo.com ADMIN_PASSWORD='senha com 12+ caracteres' \
+DATABASE_URL='<DATABASE_URL_UNPOOLED>' npm run db:create-admin
+```
+
+Para testar o build da Vercel localmente: `node scripts/build-vercel-output.mjs` gera `.vercel/output`.
 
 ## Spec-driven development (spec-kit)
 
